@@ -4,10 +4,6 @@ export type State = {
   Pick: {
     NavHeading?: string;
     Svg?: Record<string, string>;
-    SignFileType?: any;
-    // AdmissionInfo?: IAdmissionInfo;
-    // TreeEMRRecord?: $FileForm;
-    // Department?: IOption;
   };
   setPickData(Obj: State["Pick"]): void;
   resetPick(): void;

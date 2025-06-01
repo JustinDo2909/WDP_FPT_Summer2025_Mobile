@@ -5,7 +5,7 @@ export type State = {
   Auth: {
     // UserInfo?: Partial<IUser>;
     Token?: string;
-    // Permission?: IPermission;
+ 
   };
   setToken(data: string): void;
   setAuthData(Obj: State["Auth"]): void;
