@@ -1,7 +1,6 @@
 import { AxiosRequestConfig } from "axios";
 import { filter, get } from "lodash";
 import Toast from "react-native-toast-message";
-import { init } from "../constants";
 import { onSetLoading } from "../utils";
 import { instance } from "./instance";
 
@@ -14,12 +13,7 @@ function onError(
   isToast = true
 ) {
   console.info("error", error?.response);
-  const err = get(
-    error,
-    "response.data",
-    {} as // IResult
-    any
-  );
+  const err = get(error, "response.data", {} as any); // IResult
 
   if (isToast) {
     Toast.show({
@@ -33,35 +27,29 @@ function onError(
 
 function onEndPoint({
   Name,
-  Cluster = "api",
-  FuncID,
-  BaseURL = init?.Env?.URL_BE,
+
+  BaseURL = "https://cosme-play-be.vercel.app/api" ,
 }: {
   Name?: string;
-  Cluster?: string;
   BaseURL?: string;
-  FuncID?: string;
 }) {
-  return filter([BaseURL, Cluster, FuncID, Name], Boolean).join("/");
+  return filter([BaseURL, Name], Boolean).join("/");
 }
 
 function onCRUD({
   Name,
-  Cluster,
-  BaseURL,
-  FuncID,
+
+  BaseURL = "https://cosme-play-be.vercel.app/api",
 }: {
   Name?: string;
   BaseURL?: string;
-  Cluster?: string;
-  FuncID?: string;
 }) {
   type Args = {
     payload?: Record<string, unknown> | Record<string, unknown>[];
     config?: AxiosRequestConfig;
   };
 
-  const url = onEndPoint({ Name, Cluster, FuncID, BaseURL });
+  const url = onEndPoint({ Name, BaseURL });
 
   return {
     async Get({ payload, config }: Args) {

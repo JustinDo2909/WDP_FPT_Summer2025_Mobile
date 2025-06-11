@@ -1,5 +1,7 @@
+import { onCRUD, onError } from "@/src/process/api/regular";
 import { GenCtx } from "@/src/process/hooks";
 import { sStore } from "@/src/stores";
+import { AxiosResponse } from "axios";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
@@ -15,18 +17,31 @@ export default GenCtx({
     });
 
     const meds = {
-      //#region
+      //#region getProduct
+      async onGetProduct() {
+        try {
+          const { data: data }: AxiosResponse<any, AxiosResponse<string>> = await onCRUD({
+            Name: "products/1",
+          }).Get({
+            payload: {},
+          });
+
+          if (data?.Data) {
+            ss.setJointData({ Product: data?.Data });
+          }
+        } catch (error) {
+          onError({ error });
+        }
+      },
       //#endregion
     };
 
     //#region LifeCycle
 
-    useEffect(() => {}, []);
+
 
     useEffect(() => {
-      ss.resetJoint();
-      ss.resetPick();
-      //   ss.setPickData({ Department: {} });
+      meds.onGetProduct();
     }, []);
 
     //#endregion
