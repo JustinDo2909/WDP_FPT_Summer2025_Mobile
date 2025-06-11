@@ -3,7 +3,8 @@
 // tiếp tục bổ sung không xoá đi paste lại
 export const EFncID = {
  
-SignIn : "SignIn"
+SignIn : "SignIn",
+ProductDetails : "ProductDetails"
 } as const;
 //#endregion
 
