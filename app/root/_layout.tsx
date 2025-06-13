@@ -26,19 +26,19 @@ export default function Layout() {
                 }}
               >
                 {/* View cha chiếm toàn màn hình */}
-                <ImageBackground
+                {/* <ImageBackground
                   id="ImageBackground"
                     source={require('../../assets/images/react-logo.png')}
                   style={{
                     flex: 1,
                   }}
-                >
+                > */}
                   <Header />
-                  <Core id="Main" style={{ flex: 1 }}>
-                    <>{children}</>
-                  </Core>
+                    <Core id="Main" style={{ flex: 1 }}>
+                      <>{children}</>
+                    </Core>
                   <Footer />
-                </ImageBackground>
+                {/* </ImageBackground> */}
               </View>
             </TouchableWithoutFeedback>
           );

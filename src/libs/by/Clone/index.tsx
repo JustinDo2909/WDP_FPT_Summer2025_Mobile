@@ -16,7 +16,7 @@ import {
 // region Core - cấp 1
 export function Core({ style, children, ...args }: ViewProps) {
   return (
-    <View id="Core" style={Object.assign({ flex: 1, gap: 8 }, style)} {...args}>
+    <View id="Core" style={Object.assign({}, style)} {...args}>
       {children}
     </View>
   );
@@ -32,7 +32,7 @@ export function Container({ style, children, ...args }: ViewProps) {
         {
           flex: 1,
           paddingVertical: 16,
-          paddingHorizontal: 24,
+          paddingHorizontal: 12,
           gap: 16,
           position: "relative",
         },
@@ -49,7 +49,7 @@ export function Container({ style, children, ...args }: ViewProps) {
 // region Area - cấp 3
 export function Area({ style, children, ...args }: ViewProps) {
   return (
-    <View id="Area" style={StyleSheet.flatten([{ gap: 8 }, style])} {...args}>
+    <View id="Area" style={StyleSheet.flatten([ style])} {...args}>
       {children}
     </View>
   );
@@ -59,7 +59,7 @@ export function Area({ style, children, ...args }: ViewProps) {
 // region Yard - cấp 4
 export function Yard({ style, children, ...args }: ViewProps) {
   return (
-    <View id="Yard" style={StyleSheet.flatten([{ gap: 8 }, style])} {...args}>
+    <View id="Yard" style={StyleSheet.flatten([ style])} {...args}>
       {children}
     </View>
   );
@@ -71,7 +71,7 @@ export function Section({ style, children, ...args }: ViewProps) {
   return (
     <View
       id="Section"
-      style={StyleSheet.flatten([{ gap: 8 }, style])}
+      style={StyleSheet.flatten([ style])}
       {...args}
     >
       {children}
@@ -83,7 +83,7 @@ export function Section({ style, children, ...args }: ViewProps) {
 // region Anchor - cấp 6
 export function Anchor({ style, children, ...args }: ViewProps) {
   return (
-    <View id="Anchor" style={StyleSheet.flatten([{ gap: 8 }, style])} {...args}>
+    <View id="Anchor" style={StyleSheet.flatten([ style])} {...args}>
       {children}
     </View>
   );
@@ -93,7 +93,7 @@ export function Anchor({ style, children, ...args }: ViewProps) {
 // region Block - cấp 7
 export function Block({ style, children, ...args }: ViewProps) {
   return (
-    <View id="Block" style={StyleSheet.flatten([{ gap: 8 }, style])} {...args}>
+    <View id="Block" style={StyleSheet.flatten([ style])} {...args}>
       {children}
     </View>
   );
@@ -133,7 +133,7 @@ export function Card({ style, children, ...args }: ViewProps) {
 // region Box - cấp 8
 export function Box({ style, children, ...args }: ViewProps) {
   return (
-    <View id="Box" style={StyleSheet.flatten([{ gap: 8 }, style])} {...args}>
+    <View id="Box" style={StyleSheet.flatten([ style])} {...args}>
       {children}
     </View>
   );
@@ -257,7 +257,7 @@ export function Scroll({ style, children, ...args }: ViewProps) {
 // region Mass
 export function Mass({ style, children, ...args }: ViewProps) {
   return (
-    <View id="Mass" style={StyleSheet.flatten([{ gap: 8 }, style])} {...args}>
+    <View id="Mass" style={StyleSheet.flatten([ style])} {...args}>
       {children}
     </View>
   );

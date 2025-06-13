@@ -2,7 +2,8 @@ import { StateCreator } from "zustand";
 
 export type State = {
   Joint: {
-    Product? : any[]
+    Product? : IProduct,
+    Products? : IProduct[],
    
   };
   setJointData(Obj: State["Joint"]): void;

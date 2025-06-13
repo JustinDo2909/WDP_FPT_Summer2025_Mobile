@@ -1,11 +1,11 @@
 import { Box, Button, RText } from "@/src/libs/by";
 import { Image, View } from "react-native";
 
-export const ProductReview = () => (
+export const ProductReview = ({product}:{product?: IProduct}) => (
   <Box style={{ paddingVertical: 8, backgroundColor: '#fff', gap: 0 }}>
     {/* Header */}
     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8, paddingHorizontal: 6 }}>
-      <RText style={{ fontSize: 18, fontWeight: 'bold' }}>4.7</RText>
+      <RText style={{ fontSize: 18, fontWeight: 'bold' }}>{product?.rating} ({product?.reviews_count ?? 0})</RText>
       <RText style={{ fontSize: 18, marginLeft: 4 }}>⭐</RText>
       <RText style={{ fontSize: 18, marginLeft: 8, fontWeight: '500' }}>Product review</RText>
     </View>

@@ -4,18 +4,17 @@ import React from "react";
 import { BottomNavigate } from "./seg/BottomNavigate";
 import Context from "./seg/context";
 import { Modules } from "./seg/Modules";
+import { ProductGrid } from "../../share/ProductGrid";
 
 export function Home() {
   return (
     <Context.Provider>
       <Context.Consumer>
         {({ ss }) => (
-          <Container>
-            {map(ss?.Joint?.Product, (item, index) => (
-              <RText key={index}>{item}</RText>
-            ))}
-            <Modules />
-            <BottomNavigate />
+          <Container style={{paddingVertical: 0}}>
+            <ProductGrid products={ss.Joint.Products ?? []}/>
+            {/* <Modules /> */}
+            {/* <BottomNavigate /> */}
           </Container>
         )}
       </Context.Consumer>

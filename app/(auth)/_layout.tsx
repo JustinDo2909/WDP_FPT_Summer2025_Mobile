@@ -1,5 +1,5 @@
 
-import { Footer } from "@/src/pattern/core";
+import { Footer, Header } from "@/src/pattern/core";
 import { init } from "@/src/process/constants";
 import { sStore } from "@/src/stores";
 import { Redirect, Slot } from "expo-router";
@@ -29,6 +29,7 @@ export default function AppLayout() {
         resizeMode="cover"
       >
         <>
+          <Header/>
           <Slot />
           <Footer />
         </>

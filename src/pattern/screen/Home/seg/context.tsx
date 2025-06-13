@@ -18,16 +18,16 @@ export default GenCtx({
 
     const meds = {
       //#region getProduct
-      async onGetProduct() {
+      async onGetProducts() {
         try {
-          const { data: data }: AxiosResponse<any, AxiosResponse<string>> = await onCRUD({
-            Name: "products/1",
+          const { data }: AxiosResponse<IPaginatedResponse<IProduct, 'products'>> = await onCRUD({
+            Name: "products",
           }).Get({
             payload: {},
           });
 
-          if (data?.Data) {
-            ss.setJointData({ Product: data?.Data });
+          if (data?.products) {
+            ss.setJointData({ Products: data?.products });
           }
         } catch (error) {
           onError({ error });
@@ -41,7 +41,8 @@ export default GenCtx({
 
 
     useEffect(() => {
-      meds.onGetProduct();
+      ss.resetPick()
+      meds.onGetProducts();
     }, []);
 
     //#endregion

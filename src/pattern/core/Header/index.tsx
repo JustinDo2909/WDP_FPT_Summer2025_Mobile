@@ -3,132 +3,161 @@ import { init } from "@/src/process/constants";
 import { sStore } from "@/src/stores";
 import { router, useGlobalSearchParams } from "expo-router";
 import { find, isEqual, last, split } from "lodash";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, TextInput, View } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export function Header() {
   const ss = sStore();
+  
   return (
-    <Core
-      id="Header"
+    <LinearGradient
+      colors={['#FF7F7F', '#FF4F81']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
       style={{
-        flex: undefined,
-        paddingHorizontal: 24,
-        paddingVertical: 6,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      // Add top box shadow
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.15,
+      shadowRadius: 6,
+      elevation: 6,
       }}
     >
-      <Block style={{ justifyContent: "space-between", flexDirection: "row" }}>
-        <TouchableOpacity
-          onPress={() => {
-            router.push("/root" as any);
-          }}
-        >
-          <RenderTitle />
-        </TouchableOpacity>
+      <Block style={{ 
+      justifyContent: "space-between", 
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12
+      }}>
+      <RenderTitle/>
 
-        <Group
-          style={{
-            flexDirection: "row",
-            gap: 16,
-            alignContent: "center",
-          }}
-        >
-          <TouchableOpacity
-            style={{ flexDirection: "row", gap: 16 }}
-            onPress={() => {
-              // router.push({ pathname: "/root/user/info" });
-              ss.setPickData({ NavHeading: "Quay lại" });
-            }}
-          >
-            <Cover
-              style={{
-                gap: 4,
-                alignItems: "flex-end",
-                flexDirection: "column",
-              }}
-            >
-              <RText
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: init?.Color?.PrimaryDark,
-                }}
-              >
-                {/* {ss.Auth?.UserInfo?.UserName} */}
-                UserName
-              </RText>
-              <RText
-                style={{
-                  fontSize: 10,
-                  fontWeight: 400,
-                  color: init?.Color?.TextPrimary,
-                }}
-              >
-                {/* {ss.Auth?.UserInfo?.DepartmentName} */}
-                DepartmentName
-              </RText>
-            </Cover>
-          </TouchableOpacity>
-        </Group>
+      {/* Search Bar */}
+      <View style={{
+        flex: 1,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+      }}>
+        <Ionicons 
+        name="search" 
+        size={20} 
+        color="#999" 
+        style={{ marginRight: 8 }}
+        />
+        <TextInput
+        placeholder="Search your product"
+        style={{
+          flex: 1,
+          fontSize: 12,
+          color: '#333',
+        }}
+        placeholderTextColor="#999"
+        />
+      </View>
+
+      {/* Shopping Cart Icon */}
+      <TouchableOpacity
+        onPress={() => {
+        // Handle cart navigation
+        router.push("/cart" as any);
+        }}
+        style={{
+        padding: 8,
+        }}
+      >
+        <Ionicons 
+        name="bag-outline" 
+        size={24} 
+        color="white" 
+        />
+      </TouchableOpacity>
+
+      {/* Menu Icon */}
+      <TouchableOpacity
+        onPress={() => {
+        // Handle menu navigation
+        ss.setPickData({ NavHeading: "Menu" });
+        }}
+        style={{
+        padding: 4,
+        }}
+      >
+        <View style={{ gap: 2 }}>
+        <View style={{
+          width: 4,
+          height: 4,
+          borderRadius: 2,
+          backgroundColor: 'white'
+        }} />
+        <View style={{
+          width: 4,
+          height: 4,
+          borderRadius: 2,
+          backgroundColor: 'white'
+        }} />
+        <View style={{
+          width: 4,
+          height: 4,
+          borderRadius: 2,
+          backgroundColor: 'white'
+        }} />
+        </View>
+      </TouchableOpacity>
       </Block>
-    </Core>
+    </LinearGradient>
   );
 }
 
 const RenderTitle = () => {
   const ss = sStore();
-  const params = useGlobalSearchParams<
-  // ISearchParams
-  any>();
+  const params = useGlobalSearchParams<any>();
   const gFnID = last(split(String(params?.path), "/"));
   const list = ["Home", "SignIn"];
   const fnc = find(list, (ele) => isEqual(ele, gFnID));
 
   const BtnBack = (
-    <Button
-      _type="Default"
-      _set={{
-        onPress() {
-          if (router.canGoBack()) {
-            router.back();
-          }
-
-          ss.setPickData({ NavHeading: "" });
-        },
+    <TouchableOpacity
+      onPress={() => {
+        if (router.canGoBack()) {
+          router.back();
+        }
+        ss.setPickData({ NavHeading: "" });
       }}
+      style={{ padding: 4 }}
     >
-      <RText>Back</RText>
-    </Button>
+      <Ionicons 
+        name="arrow-back" 
+        size={24} 
+        color={init?.Color?.Whites || '#333'} 
+      />
+    </TouchableOpacity>
   );
 
-  if (ss.Pick?.NavHeading )   {
+  if (ss.Pick?.NavHeading) {
     return (
-      <Wrap style={{ gap: 16 }}>
+      <Wrap style={{ gap: 16, alignItems: 'center' }}>
         {BtnBack}
+        {ss.Pick?.NavHeading !== 'Back' &&
         <RText
           style={{
             fontWeight: 600,
             color: init?.Color?.PrimaryDark,
           }}
         >
-          {ss.Pick?.NavHeading ||
-            //  fnc?.FunctionName?.replace(/-/g, "")
-            fnc}
+          {ss.Pick?.NavHeading || fnc}
         </RText>
+  }
       </Wrap>
     );
   }
 
-  return (
-    // <Image
-    //   source={{
-    //     uri: `${init?.Env?.URL_MINIO}/mobile/assets/img/division/Headers.png`,
-    //   }}
-    //   style={{
-    //     objectFit: "contain",
-    //     height: Px.H(40),
-    //     width: Px.W(288),
-    //   }}
-    // />
-    <RText>Logo</RText>
-  );
+  // return (
+  //   <RText>Logo</RText>
+  // );
 };

@@ -5,30 +5,40 @@ import { ProductReview } from "./seg/ProductReview";
 import { BottomActionBar } from "./seg/BottomActionBar";
 import { Container } from "@/src/libs/by";
 import { ScrollView, StyleSheet } from "react-native";
+import Context from "./seg/context";
 
 // --- ProductGallery ---
 
-
 // --- ProductInfo ---
 
-
 // --- ProductReview ---
-
 
 // --- BottomActionBar ---
 
 export function ProductDetails() {
   return (
-    <Container style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <ProductGallery />
-        <ProductInfo />
-        <ProductReview />
-      </ScrollView>
-      <BottomActionBar />
-    </Container>
+    <Context.Provider>
+      <Context.Consumer>
+        {({ ss }) => {
+          const product = ss.Joint.Product;
+          return (
+            <Container style={styles.container}>
+              <ScrollView contentContainerStyle={styles.scrollContent}>
+                {product &&<>
+                <ProductGallery product={product} />
+                <ProductInfo product={product} />
+                <ProductReview product={product} />
+                </>
+                }
+              </ScrollView>
+              <BottomActionBar />
+            </Container>
+          );
+        }}
+      </Context.Consumer>
+    </Context.Provider>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -36,9 +46,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     paddingHorizontal: 0,
     paddingVertical: 0,
-    },
-    scrollContent: {
+  },
+  scrollContent: {
     paddingBottom: 100, // Space for bottom bar
   },
 });
-

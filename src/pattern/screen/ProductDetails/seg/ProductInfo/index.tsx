@@ -1,20 +1,73 @@
-import { Box, RText } from "@/src/libs/by";
+import { Box, Row, RText, Wrap } from "@/src/libs/by";
+import { calculateDiscount } from "@/src/libs/share/calcDiscount";
+import { formatPrice } from "@/src/libs/share/formatPrice";
+import { init } from "@/src/process/constants";
 import { View } from "react-native";
 
-export const ProductInfo = () => (
-  <Box style={{ paddingHorizontal: 6, paddingVertical: 8, marginBottom: 6, backgroundColor: "#fff", gap:0 }}>
+export const ProductInfo = ({ product }: { product: IProduct }) => (
+  <Box
+    style={{
+      paddingHorizontal: 6,
+      paddingVertical: 8,
+      marginBottom: 6,
+      backgroundColor: "#fff",
+      gap: 0,
+    }}
+  >
     {/* Replace with actual product info */}
-    <View style={{ marginBottom: 8 }}>
-      <RText style={{ fontWeight: 'bold', fontSize: 20 }}>Body Brilliant</RText>
-      <RText style={{ color: '#888', fontSize: 14 }}>Exfoliating Body Serum with 15% Glycolic Acid</RText>
-    </View>
-    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-      <View style={{ backgroundColor: '#E6D0E6', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, marginRight: 8 }}>
-        <RText style={{ color: '#B80060', fontWeight: 'bold', fontSize: 12 }}>-18%</RText>
+    <Wrap style={{ marginBottom: 8, flexDirection: 'column', alignItems: 'flex-start' }}>
+      <RText style={{ fontWeight: "600", fontSize: 20, color: init.Color.PrimaryBrand }}>
+        {product?.productBrand.title}
+      </RText>
+      <RText style={{ fontWeight: "bold", fontSize: 28 }}>
+        {product?.title}
+      </RText>
+      <RText style={{ color: "#888", fontSize: 14 }}>{product?.description}</RText>
+    </Wrap>
+    <Row
+      style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}
+    >
+      {product.sale_price && (
+      <View
+        style={{
+          backgroundColor: "#E6D0E6",
+          borderRadius: 4,
+          paddingHorizontal: 6,
+          paddingVertical: 2,
+          marginRight: 8,
+        }}
+      >
+       
+          <RText style={{ color: "#B80060", fontWeight: "bold", fontSize: 12 }}>
+            -{calculateDiscount(product.sale_price, product.price)}%
+          </RText>
       </View>
-      <RText style={{ color: '#B80060', fontWeight: 'bold', fontSize: 18, marginRight: 8 }}>2.300.000 VND</RText>
-      <RText style={{ color: '#888', textDecorationLine: 'line-through', fontSize: 14 }}>2.800.000 VND</RText>
-    </View>
-    <RText style={{ color: '#666', fontSize: 13 }}>0 đã bán</RText>
+              )}
+
+      <RText
+        style={{
+          color: "#B80060",
+          fontWeight: "bold",
+          fontSize: 24,
+          marginRight: 8,
+        }}
+      >
+        {formatPrice(product?.sale_price ?? product.price)}
+      </RText>
+      {product.sale_price && (
+        <RText
+          style={{
+            color: "#888",
+            textDecorationLine: "line-through",
+            fontSize: 14,
+          }}
+        >
+          {formatPrice(product.price)}
+        </RText>
+      )}
+    </Row>
+    <RText style={{ color: "#666", fontSize: 13 }}>
+      {product.total_stock} in stock
+    </RText>
   </Box>
 );
