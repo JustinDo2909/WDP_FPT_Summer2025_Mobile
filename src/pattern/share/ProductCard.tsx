@@ -19,7 +19,7 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, cardWidth }) => {
   const { navigate } = useCustomRouter();
-  const { ss } = context.useCtx();
+  const { ss, meds } = context.useCtx();
   const {
     id,
     image_url,
@@ -99,10 +99,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, cardWidth }) => {
             </Row>
 
             {/* Add to Cart */}
-            <TouchableOpacity style={styles.cartButton}>
+            <TouchableOpacity style={styles.cartButton} 
+            onPress={() => 
+              meds.onAddToCart(id, 1)
+            }>
               <Row style={styles.cartRow}>
                 {/* <RText style={styles.cartText}>Add To Cart</RText> */}
-                <MaterialIcons name="shopping-basket" size={16} color="#fff" />
+                <MaterialIcons name="shopping-basket" size={18} color="#6366f1" />
               </Row>
             </TouchableOpacity>
             {/* </AddToCartWrapper> */}
@@ -173,7 +176,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#8b5cf6",
     color: "#fff",
     paddingHorizontal: 4,
-    fontSize: 12,
+    padding: 2,
+    fontSize: 16,
     borderRadius: 4,
     fontWeight: "600",
   },
@@ -186,7 +190,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "600",
-    lineHeight: 20,
+    lineHeight: 12,
+    marginBottom: 6
   },
   description: {
     fontSize: 14,
@@ -202,20 +207,21 @@ const styles = StyleSheet.create({
   ratingRow: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "flex-start"
   },
   ratingText: {
     color: "#1f2937",
     fontSize: 14,
-    marginRight: 4,
+    marginTop: 1,
   },
   reviewCount: {
-    marginLeft: 4,
+    marginLeft: 0,
     fontSize: 14,
     color: "#1f2937",
   },
   cartButton: {
-    backgroundColor: "#6366f1",
-    paddingVertical: 6,
+    backgroundColor: "#fff",
+    paddingVertical: 2,
     paddingHorizontal: 12,
     borderRadius: 20,
   },

@@ -4,6 +4,7 @@ import { sStore } from "@/src/stores";
 import { AxiosResponse } from "axios";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import Toast from "react-native-toast-message";
 
 export default GenCtx({
   useLogic() {
@@ -34,7 +35,48 @@ export default GenCtx({
         }
       },
       //#endregion
+
+      //#region getCart
+      async onGetCart() {
+        try {
+          const { data }: AxiosResponse<IResponse<ICart, 'cart'>> = await onCRUD({
+            Name: "cart/get-cart",
+          }).Get({
+            payload: {},
+          });
+
+          if (data?.cart) {
+            ss.setJointData({ Cart: data?.cart });
+          }
+        } catch (error) {
+          onError({ error });
+        }
+      },
+      //#endregion
+
+      //#region AddCart
+      async onAddToCart(productId: string, quantity: number) {
+        try {
+          await onCRUD({
+            Name: "cart/add-to-cart",
+          }).Post({
+            payload: {productId: productId, quantity: quantity},
+          });
+
+          Toast.show({
+            type: "success",
+            text1: "Added to cart!",
+          });
+
+          await this.onGetCart();
+        } catch (error) {
+          onError({ error });
+        }
+      },
+      //#endregion
     };
+
+    
 
     //#region LifeCycle
 

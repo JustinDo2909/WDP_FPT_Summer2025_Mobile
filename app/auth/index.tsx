@@ -1,4 +1,4 @@
-import { Home } from "@/src/pattern/screen";
+import { Home, SignIn } from "@/src/pattern/screen";
 import { sStore } from "@/src/stores";
 import { Redirect } from "expo-router";
 import React from "react";
@@ -10,6 +10,5 @@ export default function Screen() {
     return <Redirect href={"/root" as any}  />;
   }
 
-  // return <SignIn />;
-  return <Home />;
+  return <SignIn />;
 }

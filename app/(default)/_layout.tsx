@@ -29,9 +29,9 @@ export default function AppLayout() {
         resizeMode="cover"
       >
         <>
-          <Header/>
+          {/* <Header/> */}
           <Slot />
-          <Footer />
+          {/* <Footer /> */}
         </>
       </ImageBackground>
     </View>

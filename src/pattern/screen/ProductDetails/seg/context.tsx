@@ -44,13 +44,48 @@ export default GenCtx({
       async addToCart(productId: string, quantity?: number) {
         try {
           await onCRUD({
-          Name: "cart/add",
+          Name: "cart/add-to-cart",
           }).Post({
             payload: {
               productId: productId,
               quantity: quantity ?? 1,
             },
           });
+        } catch (error) {
+          onError({ error });
+        }
+      },
+      //#endregion
+
+      //#region getCart
+      async onGetCart() {
+        try {
+          const { data }: AxiosResponse<IResponse<ICart, 'cart'>> = await onCRUD({
+            Name: "cart/get-cart",
+          }).Get({
+            payload: {},
+          });
+
+          if (data?.cart) {
+            ss.setJointData({ Cart: data?.cart });
+          }
+        } catch (error) {
+          onError({ error });
+        }
+      },
+      //#endregion
+
+      //#region onPutCart
+      async onPutCart({productId, quantity}:{productId: string, quantity: number}) {
+        try {
+          await onCRUD({
+            Name: "cart/update-cart",
+          }).Get({
+            payload: {productId: productId, quantity: quantity ?? 1},
+          });
+          
+          await this.onGetCart();
+
         } catch (error) {
           onError({ error });
         }

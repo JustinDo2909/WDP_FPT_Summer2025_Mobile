@@ -17,18 +17,49 @@ export default GenCtx({
     });
 
     const meds = {
-      //#region getProduct
-      async onGetProducts() {
+      //#region getCart
+      async onGetCart() {
         try {
-          const { data }: AxiosResponse<IPaginatedResponse<IProduct, 'products'>> = await onCRUD({
-            Name: "products",
+          const { data }: AxiosResponse<IResponse<ICart, 'cart'>> = await onCRUD({
+            Name: "cart/get-cart",
           }).Get({
             payload: {},
           });
 
-          if (data?.products) {
-            ss.setJointData({ Products: data?.products });
+          if (data?.cart) {
+            ss.setJointData({ Cart: data?.cart });
           }
+        } catch (error) {
+          onError({ error });
+        }
+      },
+      //#endregion
+
+      async onPutCart({productId, quantity}:{productId: string, quantity: number}) {
+        try {
+          await onCRUD({
+            Name: "cart/update-cart",
+          }).Get({
+            payload: {productId: productId, quantity: quantity},
+          });
+          
+          await this.onGetCart();
+
+        } catch (error) {
+          onError({ error });
+        }
+      },
+      //#endregion
+
+      async onDeleteCart(productId: string) {
+        try {
+          await onCRUD({
+            Name: `cart/remove-from-cart/${productId}`,
+          }).Delete({
+            payload: {},
+          });
+
+          await this.onGetCart();
         } catch (error) {
           onError({ error });
         }
@@ -41,8 +72,8 @@ export default GenCtx({
 
 
     useEffect(() => {
-      ss.resetPick()
-      meds.onGetProducts();
+      ss.setPickData({NavHeading: "Shopping Cart"})
+      meds.onGetCart();
     }, []);
 
     //#endregion

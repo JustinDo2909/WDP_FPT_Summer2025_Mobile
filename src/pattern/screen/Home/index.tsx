@@ -11,7 +11,7 @@ export function Home() {
     <Context.Provider>
       <Context.Consumer>
         {({ ss }) => (
-          <Container style={{paddingVertical: 0}}>
+          <Container style={{paddingVertical: 0, backgroundColor: "f5f5f5"}}>
             <ProductGrid products={ss.Joint.Products ?? []}/>
             {/* <Modules /> */}
             {/* <BottomNavigate /> */}
