@@ -39,6 +39,23 @@ export default GenCtx({
         }
       },
       //#endregion
+
+      //#region addToCart
+      async addToCart(productId: string, quantity?: number) {
+        try {
+          await onCRUD({
+          Name: "cart/add",
+          }).Post({
+            payload: {
+              productId: productId,
+              quantity: quantity ?? 1,
+            },
+          });
+        } catch (error) {
+          onError({ error });
+        }
+      },
+      //#endregion
     };
 
     //#region LifeCycle

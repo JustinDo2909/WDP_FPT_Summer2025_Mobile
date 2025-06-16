@@ -4,7 +4,7 @@ export type State = {
   Joint: {
     Product? : IProduct,
     Products? : IProduct[],
-   
+    Cart?: ICart;
   };
   setJointData(Obj: State["Joint"]): void;
   resetJoint(): void;

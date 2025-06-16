@@ -5,6 +5,7 @@ import { TouchableOpacity, View } from "react-native";
 import { MaterialIcons, Ionicons, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { map } from "lodash";
 import { useRouter } from "expo-router";
+import { sStore } from "@/src/stores";
 
 const tabs = [
   { key: "Home", label: "Home", icon: <MaterialIcons name="home" size={24} color="black" /> },
@@ -18,6 +19,7 @@ const tabs = [
 export function Footer() {
   const route = useRoute();
   const router = useRouter()
+  const ss = sStore()
   if (route.name === "ProductDetails") {
     return null;
   }
@@ -44,7 +46,9 @@ export function Footer() {
         <TouchableOpacity
           key={tab.key}
           style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          onPress={() => {  router.push(`/root/dynamic?path=/${tab.key}`);
+          onPress={() => {  
+            ss.setPickData({NavHeading: ""})
+            router.push(`/root/dynamic?path=/${tab.key}`);
           }}
           activeOpacity={0.7}
         >

@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   oldPrice: {
     textDecorationLine: "line-through",
     color: "#9ca3af",
-    fontSize: 12,
+    fontSize: 16,
   },
   priceRow: {
     flexDirection: "row",
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   currentPrice: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "600",
     color: "#db2777",
   },
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   title: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "600",
     lineHeight: 20,
   },
@@ -205,12 +205,12 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     color: "#1f2937",
-    fontSize: 12,
+    fontSize: 14,
     marginRight: 4,
   },
   reviewCount: {
     marginLeft: 4,
-    fontSize: 12,
+    fontSize: 14,
     color: "#1f2937",
   },
   cartButton: {

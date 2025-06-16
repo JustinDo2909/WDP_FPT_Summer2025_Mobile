@@ -31,7 +31,7 @@ export function ProductDetails() {
                 </>
                 }
               </ScrollView>
-              <BottomActionBar />
+              {product && <BottomActionBar product={product} />}
             </Container>
           );
         }}

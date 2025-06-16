@@ -6,9 +6,11 @@ import { find, isEqual, last, split } from "lodash";
 import { TouchableOpacity, TextInput, View } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useCustomRouter } from "@/src/libs/hooks/useCustomRouter";
 
 export function Header() {
   const ss = sStore();
+  const { navigate} = useCustomRouter()
   
   return (
     <LinearGradient
@@ -26,6 +28,7 @@ export function Header() {
       elevation: 6,
       }}
     >
+
       <Block style={{ 
       justifyContent: "space-between", 
       flexDirection: "row",
@@ -34,7 +37,8 @@ export function Header() {
       }}>
       <RenderTitle/>
 
-      {/* Search Bar */}
+
+      {ss.Pick?.NavHeading !== 'Shopping Cart' && <>
       <View style={{
         flex: 1,
         backgroundColor: 'white',
@@ -42,7 +46,7 @@ export function Header() {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingVertical: 8,
+        paddingVertical: 2,
       }}>
         <Ionicons 
         name="search" 
@@ -65,7 +69,10 @@ export function Header() {
       <TouchableOpacity
         onPress={() => {
         // Handle cart navigation
-        router.push("/cart" as any);
+        ss.setPickData({ NavHeading: "Shopping Cart" });
+        navigate({
+          pathSegments: ["Cart"]
+        })
         }}
         style={{
         padding: 8,
@@ -77,13 +84,14 @@ export function Header() {
         color="white" 
         />
       </TouchableOpacity>
+      </>}
 
       {/* Menu Icon */}
       <TouchableOpacity
-        onPress={() => {
-        // Handle menu navigation
-        ss.setPickData({ NavHeading: "Menu" });
-        }}
+        // onPress={() => {
+        // // Handle menu navigation
+        // ss.setPickData({ NavHeading: "Menu" });
+        // }}
         style={{
         padding: 4,
         }}
@@ -118,7 +126,7 @@ const RenderTitle = () => {
   const ss = sStore();
   const params = useGlobalSearchParams<any>();
   const gFnID = last(split(String(params?.path), "/"));
-  const list = ["Home", "SignIn"];
+  const list = ["Home", "SignIn","Shopping Cart"];
   const fnc = find(list, (ele) => isEqual(ele, gFnID));
 
   const BtnBack = (
@@ -147,7 +155,9 @@ const RenderTitle = () => {
         <RText
           style={{
             fontWeight: 600,
-            color: init?.Color?.PrimaryDark,
+            color: init?.Color?.Whites,
+            fontSize: 20,
+            paddingVertical: 14
           }}
         >
           {ss.Pick?.NavHeading || fnc}
