@@ -2,81 +2,16 @@ import { Button, Container, Row, RText } from "@/src/libs/by";
 import { Ionicons } from '@expo/vector-icons';
 import { map } from "lodash";
 import React from "react";
-import { ScrollView, StyleSheet, View, Alert } from "react-native";
+import { ScrollView, StyleSheet, View, Alert, TouchableOpacity } from "react-native";
 import { CartItem } from "./seg/CartItem";
 import Context from "./seg/context";
+import { formatPrice } from "@/src/libs/share/formatPrice";
 
 export function Cart() {
   return (
     <Context.Provider>
       <Context.Consumer>
-        {({ ss }) => {
-          const cart = ss.Joint.Cart as ICart | undefined;
-          const [selected, setSelected] = React.useState<number[]>([]);
-          const [isLoading, setIsLoading] = React.useState(false);
-
-          // Handle individual item selection
-          const handleSelect = (id: number) => {
-            setSelected((prev) => 
-              prev.includes(id) 
-                ? prev.filter(i => i !== id) 
-                : [...prev, id]
-            );
-          };
-
-          // Handle select all functionality
-          const handleSelectAll = () => {
-            const allItemIds = cart?.cartItems?.map(item => item.id) ?? [];
-            const allSelected = selected.length === allItemIds.length && allItemIds.length > 0;
-            setSelected(allSelected ? [] : allItemIds);
-          };
-
-          // Calculate total cost of selected items
-          const calculateTotal = () => {
-            if (!cart?.cartItems) return 0;
-            return cart.cartItems
-              .filter(item => selected.includes(item.id))
-              .reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-          };
-
-          // Format currency
-          const formatCurrency = (amount: number) => {
-            return new Intl.NumberFormat('vi-VN', {
-              style: 'currency',
-              currency: 'VND'
-            }).format(amount);
-          };
-
-          // Handle voucher selection
-          const handleVoucherPress = () => {
-            // Navigate to voucher selection screen or show modal
-            Alert.alert("Vouchers", "Voucher selection feature coming soon!");
-          };
-
-          // Handle buy action
-          const handleBuyPress = async () => {
-            if (selected.length === 0) {
-              Alert.alert("No items selected", "Please select items to purchase.");
-              return;
-            }
-
-            setIsLoading(true);
-            try {
-              // Simulate API call
-              await new Promise(resolve => setTimeout(resolve, 1000));
-              Alert.alert("Success", "Items purchased successfully!");
-              setSelected([]); // Clear selection after successful purchase
-            } catch (error) {
-              Alert.alert("Error", "Failed to process purchase. Please try again.");
-            } finally {
-              setIsLoading(false);
-            }
-          };
-
-          const totalCost = calculateTotal();
-          const allItemIds = cart?.cartItems?.map(item => item.id) ?? [];
-          const isAllSelected = selected.length === allItemIds.length && allItemIds.length > 0;
-          const hasSelectedItems = selected.length > 0;
+        {({ ss, selected, hasSelectedItems, isLoading, isAllSelected, cart, meds, totalCost }) => {
 
           // Empty cart state
           if (!cart?.cartItems || cart.cartItems.length === 0) {
@@ -99,7 +34,7 @@ export function Cart() {
                     key={item.id} 
                     item={item} 
                     selected={selected.includes(item.id)} 
-                    onSelect={handleSelect} 
+                    onSelect={meds.handleSelect} 
                   />
                 ))}
               </ScrollView>
@@ -113,7 +48,7 @@ export function Cart() {
                   </Row>
                   <Button 
                     _set={{ 
-                      onPress: handleVoucherPress, 
+                      onPress: meds.handleVoucherPress, 
                       style: styles.voucherButton 
                     }} 
                     _type="Default"
@@ -128,32 +63,29 @@ export function Cart() {
               <View style={styles.bottomBar}>
                 <Row style={styles.bottomRow}>
                   <Row style={styles.selectAllSection}>
-                    <Button 
-                      _set={{ 
-                        onPress: handleSelectAll, 
-                        style: styles.selectAllBtn 
-                      }} 
-                      _type="Icon"
+                    <TouchableOpacity 
+                      onPress={meds.handleSelectAll}
+                      style={styles.selectAllBtn}
                     >
                       <Ionicons 
                         name={isAllSelected ? "checkbox" : "square-outline"} 
-                        size={26} 
+                        size={21} 
                         color="#222" 
                       />
-                    </Button>
+                    </TouchableOpacity>
                     <RText style={styles.selectAllText}>Select all</RText>
                   </Row>
                   
                   <View style={styles.costSection}>
                     <RText style={styles.costLabel}>Total:</RText>
                     <RText style={styles.costText}>
-                      {formatCurrency(totalCost)}
+                      {formatPrice(totalCost)}
                     </RText>
                   </View>
                   
                   <Button 
                     _set={{ 
-                      onPress: handleBuyPress, 
+                      onPress: meds.handleBuyPress, 
                       style: [
                         styles.buyBtn, 
                         !hasSelectedItems && styles.buyBtnDisabled
@@ -222,8 +154,8 @@ const styles = StyleSheet.create({
     flex: 1 
   },
   voucherLeft: { 
-    alignItems: 'center', 
-    gap: 8 
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   voucherLabel: { 
     color: '#222', 
@@ -258,11 +190,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between' 
   },
   selectAllSection: { 
-    alignItems: 'center', 
-    gap: 8 
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   selectAllBtn: { 
-    padding: 0 
+    padding: 0,
   },
   selectAllText: { 
     fontWeight: 'bold', 
@@ -289,7 +221,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     minWidth: 80,
     alignItems: 'center',
-  },
+  }, 
   buyBtnDisabled: {
     backgroundColor: '#ddd',
   },

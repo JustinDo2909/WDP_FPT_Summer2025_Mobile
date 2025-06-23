@@ -1,4 +1,3 @@
-
 import { onCRUD, onError } from "@/src/process/api/regular";
 import { GenCtx } from "@/src/process/hooks";
 import { sStore } from "@/src/stores";
@@ -6,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AxiosResponse } from "axios";
 import { useRouter } from "expo-router";
 import { delay } from "lodash";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Toast from "react-native-toast-message";
 
@@ -28,6 +28,8 @@ export default GenCtx({
         fields: {},
       },
     });
+
+    const [loading, setLoading] = useState(false);
 
     const meds = {
       //#region getCart
@@ -69,6 +71,7 @@ export default GenCtx({
       //#region onSignIn
       async onSignIn({ fields }: IForm) {
         try {
+          setLoading(true);
            const { data: dUser }:AxiosResponse<any> = await onCRUD(
             {
               Name: "auth/login",
@@ -118,9 +121,10 @@ export default GenCtx({
 
               delay(() => {
                 router.push("/root");
+                setLoading(false);
               }, 500);
-          
-      } catch (error) {
+          } catch (error) {
+          setLoading(false);
           onError({ error });
         }
       },
@@ -135,6 +139,7 @@ export default GenCtx({
     return {
       methods,
       meds,
+      loading,
     };
   },
 });

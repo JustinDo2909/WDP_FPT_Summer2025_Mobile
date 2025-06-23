@@ -42,11 +42,11 @@ export function CartItem({ item, selected, onSelect }: {
 const styles = StyleSheet.create({
   card: { marginBottom: 12, backgroundColor: '#fff', borderRadius: 12, padding: 12 },
   image: { width: 72, height: 72, borderRadius: 8, backgroundColor: '#f3f3f3' },
-  title: { fontWeight: 'bold', fontSize: 16 },
+  title: { fontWeight: 'bold', fontSize: 18 },
   desc: { color: '#888', fontSize: 13 },
   discountBadge: { backgroundColor: '#8b5cf6', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
   discountText: { color: '#fff', fontWeight: 'bold', fontSize: 12 },
   price: { color: '#F23059', fontWeight: 'bold', fontSize: 18 },
   oldPrice: { color: '#bbb', textDecorationLine: 'line-through', fontSize: 14, marginLeft: 6 },
-  qty: { color: '#666', fontSize: 13, marginTop: 4 },
+  qty: { color: '#666', fontSize: 15, marginTop: 4 },
 });

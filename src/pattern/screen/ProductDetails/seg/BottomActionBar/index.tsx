@@ -1,7 +1,10 @@
 import { Button, Row, RText, Wrap } from "@/src/libs/by";
 import { formatPrice } from '@/src/libs/share/formatPrice';
 
-export const BottomActionBar = ({product}:{product: IProduct}) => (
+export const BottomActionBar = ({product}:{product: IProduct}) => {
+  const ss = sStore
+  
+  return (
   <Row style={{
     flexDirection: 'row',
     alignItems: 'center',
@@ -30,4 +33,5 @@ export const BottomActionBar = ({product}:{product: IProduct}) => (
     </Wrap>
     
   </Row>
-);
+); 
+}
