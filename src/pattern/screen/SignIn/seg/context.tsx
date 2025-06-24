@@ -62,7 +62,7 @@ export default GenCtx({
             });
 
           if (data?.user) {
-            ss.setJointData({ User: data?.user });
+            ss.setAuthData({ User: data?.user });
           }
         } catch (error) {
           onError({ error });

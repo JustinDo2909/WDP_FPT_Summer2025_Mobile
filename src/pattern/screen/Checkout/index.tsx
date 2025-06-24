@@ -1,4 +1,5 @@
 import { Button, RText } from "@/src/libs/by";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { FlatList, Modal, StyleSheet, View } from "react-native";
 import { AddAddressForm } from "./seg/AddAddressForm";
@@ -7,6 +8,8 @@ import { CartItems } from "./seg/CartItems";
 import Context from "./seg/context";
 import { OrderSummary } from "./seg/OrderSummary";
 import { VoucherPicker } from "./seg/VoucherPicker";
+import { init } from "@/src/process/constants";
+import { formatPrice } from "@/src/libs/share/formatPrice";
 
 export function Checkout() {
   return (
@@ -31,8 +34,7 @@ export function Checkout() {
           shippingFee,
           total,
           isLoading,
-          handleBuyNow,
-          fetchAddresses,
+          meds
         }) => (
           <View style={styles.container}>
             <FlatList
@@ -40,12 +42,21 @@ export function Checkout() {
               keyExtractor={item => item.id.toString()}
               ListHeaderComponent={
                 <>
-                  {/* Address Picker */}
-                  <Button _type="Stroke" _set={{ onPress: () => setShowAddressPicker(true), style: styles.sectionBtn }}>
-                    <RText style={styles.sectionBtnText}>
-                      {selectedAddress ? `${selectedAddress.fullname}, ${selectedAddress.address}, ${selectedAddress.city}` : "Choose shipping address"}
-                    </RText>
-                  </Button>
+                  {/* Shipping Card */}
+                  <View style={styles.cardRow}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                      <Ionicons name="car-outline" size={28} color="#3A3A3A" style={{ marginRight: 12 }} />
+                      <View>
+                        <RText style={styles.cardTitle}>Shipping</RText>
+                        <RText style={styles.cardSubtitle}>
+                          {selectedAddress ? `${selectedAddress.fullname}, ${selectedAddress.address}, ${selectedAddress.city}` : "Add shipping address"}
+                        </RText>
+                      </View>
+                    </View>
+                    <Button _type="Fill" _set={{ onPress: () => setShowAddressPicker(true), style: styles.addBtn }}>
+                      <RText style={styles.addBtnText}>Add</RText>
+                    </Button>
+                  </View>
                 </>
               }
               renderItem={({ item }) => (
@@ -53,15 +64,23 @@ export function Checkout() {
               )}
               ListFooterComponent={
                 <>
-                  {/* Voucher Picker */}
-                  <Button _type="Stroke" _set={{ onPress: () => setShowVoucherPicker(true), style: styles.sectionBtn }}>
-                    <RText style={styles.sectionBtnText}>
-                      {selectedVoucher ? `${selectedVoucher.title} - ${selectedVoucher.amount} VND` : "Select voucher"}
-                    </RText>
-                  </Button>
+                  {/* Voucher Card */}
+                  <View style={styles.cardRow}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                      <Ionicons name="pricetag-outline" size={28} color="#3A3A3A" style={{ marginRight: 12 }} />
+                      <View>
+                        <RText style={styles.cardTitle}>Voucher</RText>
+                        <RText style={styles.cardSubtitle}>
+                          {selectedVoucher ? `${formatDiscount(selectedVoucher)}` : "Add Voucher"}
+                        </RText>
+                      </View>
+                    </View>
+                    <Button _type="Fill" _set={{ onPress: () => setShowVoucherPicker(true), style: styles.addBtn }}>
+                      <RText style={styles.addBtnText}>Add</RText>
+                    </Button>
+                  </View>
                   {/* Order Summary */}
                   <OrderSummary subtotal={subtotal} discount={discount} shippingFee={shippingFee} total={total} />
-                  {/* <View style={{ height: 120 }} /> */}
                 </>
               }
               contentContainerStyle={styles.scrollContent}
@@ -69,7 +88,7 @@ export function Checkout() {
             {/* Sticky Bar */}
             <View style={styles.stickyBar}>
               <RText style={styles.stickyTotal}>Total: {total.toLocaleString()} VND</RText>
-              <Button _type="Fill" _set={{ onPress: handleBuyNow, style: styles.buyBtn, disabled: isLoading }}>
+              <Button _type="Fill" _set={{ onPress: meds.onBuyNow, style: styles.buyBtn, disabled: isLoading || !shippingFee }}>
                 <RText style={styles.buyBtnText}>{isLoading ? "Processing..." : "Buy now"}</RText>
               </Button>
             </View>
@@ -87,7 +106,7 @@ export function Checkout() {
             </Modal>
             {/* Add Address Modal */}
             <Modal visible={showAddAddress} animationType="slide">
-              <AddAddressForm onSave={addr => { setShowAddAddress(false); fetchAddresses(); }} />
+              <AddAddressForm onSave={addr => { setShowAddAddress(false); meds.onGetAddresses; }} />
               <Button _type="Stroke" _set={{ onPress: () => setShowAddAddress(false), style: { margin: 16 } }}>
                 <RText>Close</RText>
               </Button>
@@ -115,8 +134,32 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 30 },
   sectionBtn: { margin: 16, borderRadius: 8, padding: 12 },
   sectionBtnText: { fontWeight: 'bold', fontSize: 16 },
+  cardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardTitle: { fontWeight: 'bold', fontSize: 16, color: '#222' },
+  cardSubtitle: { color: '#888', fontSize: 14, marginTop: 2 },
+  addBtn: { backgroundColor: init.Color.PrimaryBrand, borderRadius: 8, paddingVertical: 6, paddingHorizontal: 18 },
+  addBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
   stickyBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: '#fff', borderTopWidth: 1, borderColor: '#eee', position: 'absolute', left: 0, right: 0, bottom: 0 },
   stickyTotal: { fontWeight: 'bold', fontSize: 18, color: '#F23059' },
-  buyBtn: { backgroundColor: '#F23059', borderRadius: 8, paddingVertical: 2, paddingHorizontal: 32 },
+  buyBtn: { backgroundColor: '#F23059', borderRadius: 8, paddingVertical: 8, height: 40, paddingHorizontal: 32 },
   buyBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 18 },
 });
+
+const formatDiscount = (voucher: IVoucher) => {
+  return voucher.type === "PERCENT"
+    ? `${voucher.discount_value}% Off `
+    : `${formatPrice(voucher.discount_value)} Off`;
+};

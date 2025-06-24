@@ -7,13 +7,68 @@ import { TouchableOpacity, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useCustomRouter } from "@/src/libs/hooks/useCustomRouter";
+import { useState, useRef } from "react";
+import { onCRUD } from "@/src/process/api/regular";
 
 export function Header() {
   const ss = sStore();
   const { navigate } = useCustomRouter();
   const router = useRouter();
-  const isLoggedIn = ss?.Joint.User !== undefined;
+  const isLoggedIn = ss?.Auth.User !== undefined;
   const cartQuantity = ss.Joint.Cart?.cartItems.length ?? 0;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuButtonRef = useRef(null);
+
+  // Import onCRUD for logout
+
+  // Dropdown menu component
+  const DropdownMenu = () => (
+    menuOpen ? (
+      <View
+        style={{
+          position: "absolute",
+          top: 48,
+          right: 0,
+          backgroundColor: "#fff",
+          borderRadius: 10,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.15,
+          shadowRadius: 6,
+          elevation: 6,
+          minWidth: 140,
+          zIndex: 100,
+        }}
+      >
+        <TouchableOpacity
+          style={{ padding: 14, flexDirection: "row", alignItems: "center" }}
+          onPress={() => {
+            setMenuOpen(false);
+            // Help action (can be replaced with navigation or modal)
+            if (typeof window !== "undefined") {
+              alert("Help coming soon!");
+            }
+          }}
+        >
+          <Ionicons name="help-circle-outline" size={20} color="#FF4F81" style={{ marginRight: 8 }} />
+          <RText style={{ color: "#FF4F81", fontSize: 16 }}>Help?</RText>
+        </TouchableOpacity>
+        <View style={{ height: 1, backgroundColor: "#eee", marginHorizontal: 8 }} />
+        <TouchableOpacity
+          style={{ padding: 14, flexDirection: "row", alignItems: "center" }}
+          onPress={async () => {
+            setMenuOpen(false);
+            await onCRUD({ Name: "auth/logout" }).Post({});
+            ss.resetAuth && ss.resetAuth();
+            router.push("/auth");
+          }}
+        >
+          <Ionicons name="key-outline" size={20} color="#FF4F81" style={{ marginRight: 8 }} />
+          <RText style={{ color: "#FF4F81", fontSize: 16 }}>Log out</RText>
+        </TouchableOpacity>
+      </View>
+    ) : null
+  );
 
   return (
     <LinearGradient
@@ -41,7 +96,7 @@ export function Header() {
       >
         <RenderTitle />
 
-        {ss.Pick?.NavHeading !== "Shopping Cart" && (
+        {(ss.Pick?.NavHeading !== "Shopping Cart" && ss.Pick?.NavHeading !== "Checkout") && (
           <>
             <View
               style={{
@@ -112,26 +167,29 @@ export function Header() {
 
         {isLoggedIn ? (
           <>
-            {/* Search Bar */}
-
-            {/* Cart Icon */}
-
             {/* Menu Icon */}
-            <TouchableOpacity style={{ padding: 4 }}>
-              <View style={{ gap: 2 }}>
-                {[...Array(3)].map((_, i) => (
-                  <View
-                    key={i}
-                    style={{
-                      width: 4,
-                      height: 4,
-                      borderRadius: 2,
-                      backgroundColor: "white",
-                    }}
-                  />
-                ))}
-              </View>
-            </TouchableOpacity>
+            <View style={{ position: "relative" }}>
+              <TouchableOpacity
+                ref={menuButtonRef}
+                style={{ padding: 4 }}
+                onPress={() => setMenuOpen((v) => !v)}
+              >
+                <View style={{ gap: 2 }}>
+                  {[...Array(3)].map((_, i) => (
+                    <View
+                      key={i}
+                      style={{
+                        width: 4,
+                        height: 4,
+                        borderRadius: 2,
+                        backgroundColor: "white",
+                      }}
+                    />
+                  ))}
+                </View>
+              </TouchableOpacity>
+              <DropdownMenu />
+            </View>
           </>
         ) : (
           // Not logged in → show Login button
@@ -151,38 +209,6 @@ export function Header() {
             </RText>
           </TouchableOpacity>
         )}
-
-        {/* Menu Icon */}
-        {/* <TouchableOpacity
-        // onPress={() => {
-        // // Handle menu navigation
-        // ss.setPickData({ NavHeading: "Menu" });
-        // }}
-        style={{
-        padding: 4,
-        }}
-      >
-        <View style={{ gap: 2 }}>
-        <View style={{
-          width: 4,
-          height: 4,
-          borderRadius: 2,
-          backgroundColor: 'white'
-        }} />
-        <View style={{
-          width: 4,
-          height: 4,
-          borderRadius: 2,
-          backgroundColor: 'white'
-        }} />
-        <View style={{
-          width: 4,
-          height: 4,
-          borderRadius: 2,
-          backgroundColor: 'white'
-        }} />
-        </View>
-      </TouchableOpacity> */}
       </Block>
     </LinearGradient>
   );

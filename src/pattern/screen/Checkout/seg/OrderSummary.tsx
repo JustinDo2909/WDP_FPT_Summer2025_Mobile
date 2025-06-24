@@ -21,7 +21,7 @@ export function OrderSummary({ subtotal, discount, shippingFee, total }: {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: '#fff', borderRadius: 12, marginVertical: 12 },
+  container: { padding: 16, backgroundColor: '#fff', borderRadius: 12, margin: 12 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', fontSize: 16, marginBottom: 4 },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
   totalLabel: { fontWeight: 'bold', fontSize: 18 },

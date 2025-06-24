@@ -31,11 +31,24 @@ declare global {
     ward: string;
   }
 
+   type IVoucher = {
+    id: string;
+    user_id: string;
+    event_reward_id: string;
+    stripe_coupon_id: string;
+    discount_value: number;
+    type: "PERCENT" | "AMOUNT";
+    redeemed: boolean;
+    redeemed_at: string | null;
+    created_at: string;
+  }
+
 
 }
 
 export type {
   ICart,
   ICartLineItem,
-  IAddress
+  IAddress,
+  IVoucher
 };
