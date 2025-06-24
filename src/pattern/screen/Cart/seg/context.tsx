@@ -1,3 +1,4 @@
+import { useCustomRouter } from "@/src/libs/hooks/useCustomRouter";
 import { onCRUD, onError } from "@/src/process/api/regular";
 import { GenCtx } from "@/src/process/hooks";
 import { sStore } from "@/src/stores";
@@ -17,10 +18,12 @@ export default GenCtx({
       },
     });
 
-    const [selected, setSelected] = useState<number[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     const cart = ss.Joint?.Cart;
+    const { navigate } = useCustomRouter();
+
+    // Remove selection logic, all items are checkoutable by default
 
     const meds = {
       //#region Cart APIs
@@ -44,7 +47,7 @@ export default GenCtx({
         try {
           await onCRUD({
             Name: "cart/update-cart",
-          }).Get({ payload: { productId, quantity } });
+          }).Put({ payload: { productId, quantity } });
 
           await meds.onGetCart();
         } catch (error) {
@@ -66,23 +69,23 @@ export default GenCtx({
       //#endregion
 
       //#region Cart logic
-      handleSelect(id: number) {
-        setSelected((prev) =>
-          prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-        );
+      handleQuantityChange: (id: number, newQty: number) => {
+        const item = cart?.cartItems?.find(i => i.id === id);
+        if (!item) return;
+        const inStock = item.product.total_stock ?? 0;
+        if (newQty < 1 || newQty > inStock) return;
+        meds.onPutCart({ productId: item.product_id, quantity: newQty });
       },
 
-      handleSelectAll() {
-        const allItemIds = cart?.cartItems?.map((item) => item.id) ?? [];
-        const allSelected = selected.length === allItemIds.length && allItemIds.length > 0;
-        setSelected(allSelected ? [] : allItemIds);
+      handleRemove: (id: number) => {
+        const item = cart?.cartItems?.find(i => i.id === id);
+        if (!item) return;
+        meds.onDeleteCart(item.product_id);
       },
 
       calculateTotal() {
         if (!cart?.cartItems) return 0;
-        return cart.cartItems
-          .filter((item) => selected.includes(item.id))
-          .reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+        return cart.cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
       },
 
       formatCurrency(amount: number) {
@@ -97,22 +100,13 @@ export default GenCtx({
       },
 
       async handleBuyPress() {
-        if (selected.length === 0) {
-          Alert.alert("No items selected", "Please select items to purchase.");
+        if (!cart?.cartItems?.length) {
+          Alert.alert("No items in cart", "Please add items to purchase.");
           return;
         }
-
-        setIsLoading(true);
-        try {
-          // Simulate API call
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          Alert.alert("Success", "Items purchased successfully!");
-          setSelected([]);
-        } catch (error) {
-          Alert.alert("Error", "Failed to process purchase. Please try again.");
-        } finally {
-          setIsLoading(false);
-        }
+        ss.setJointData({ CheckoutCartItems: cart.cartItems });
+        ss.setPickData({ NavHeading: "Checkout" });
+        navigate({ pathSegments: ["Checkout"] });
       },
       //#endregion
     };
@@ -124,21 +118,11 @@ export default GenCtx({
     }, []);
     //#endregion
 
-    // Derived values for UI
-    const allItemIds = cart?.cartItems?.map((item) => item.id) ?? [];
-    const isAllSelected = selected.length === allItemIds.length && allItemIds.length > 0;
-    const hasSelectedItems = selected.length > 0;
-    const totalCost = meds.calculateTotal();
-
     return {
       meds,
       methods,
       ss,
       cart,
-      selected,
-      isAllSelected,
-      hasSelectedItems,
-      totalCost,
       isLoading,
     };
   },

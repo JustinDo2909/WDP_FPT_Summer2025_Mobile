@@ -5,7 +5,9 @@ export type State = {
     Product? : IProduct,
     Products? : IProduct[],
     Cart?: ICart,
-    User?: IUser
+    User?: IUser,
+    cartSpin?: boolean,
+    CheckoutCartItems?: ICartLineItem[],
   };
   setJointData(Obj: State["Joint"]): void;
   resetJoint(): void;

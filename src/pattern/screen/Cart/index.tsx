@@ -1,46 +1,23 @@
 import { Button, Container, Row, RText } from "@/src/libs/by";
-import { Ionicons } from '@expo/vector-icons';
-import { map } from "lodash";
+import { formatPrice } from "@/src/libs/share/formatPrice";
+import { init } from "@/src/process/constants";
 import React from "react";
-import { ScrollView, StyleSheet, View, Alert, TouchableOpacity } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { CartItem } from "./seg/CartItem";
 import Context from "./seg/context";
-import { formatPrice } from "@/src/libs/share/formatPrice";
 
 export function Cart() {
   return (
     <Context.Provider>
       <Context.Consumer>
-        {({ ss, selected, hasSelectedItems, isLoading, isAllSelected, cart, meds, totalCost }) => {
-
-          // Empty cart state
-          if (!cart?.cartItems || cart.cartItems.length === 0) {
-            return (
-              <Container style={styles.container}>
-                <View style={styles.emptyState}>
-                  <Ionicons name="cart-outline" size={64} color="#ccc" />
-                  <RText style={styles.emptyText}>Your cart is empty</RText>
-                  <RText style={styles.emptySubtext}>Add some items to get started</RText>
-                </View>
-              </Container>
-            );
-          }
-
+        {({ ss, cart, meds, isLoading }) => {
+          const cartItems = cart?.cartItems ?? [];
           return (
-            <Container style={styles.container}>
-              <ScrollView style={styles.scrollView}>
-                {map(cart.cartItems, (item) => (
-                  <CartItem 
-                    key={item.id} 
-                    item={item} 
-                    selected={selected.includes(item.id)} 
-                    onSelect={meds.handleSelect} 
-                  />
-                ))}
-              </ScrollView>
+            <Container style={{ backgroundColor: '#fff', flex: 1, paddingBottom: 0 }}>
+              {/* <Header title="My Cart" /> */}
 
               {/* Voucher Bar */}
-              <View style={styles.voucherBar}>
+              {/* <View style={styles.voucherBar}>
                 <Row style={styles.voucherRow}>
                   <Row style={styles.voucherLeft}>
                     <Ionicons name="pricetag-outline" size={22} color="#222" />
@@ -57,29 +34,26 @@ export function Cart() {
                     <Ionicons name="chevron-forward" size={18} color="#888" />
                   </Button>
                 </Row>
-              </View>
+              </View> */}
+
+              <ScrollView style={{ flex: 1 }}>
+                {cartItems.map((item) => (
+                  <CartItem
+                    key={item.id}
+                    item={item}
+                    onQuantityChange={meds.handleQuantityChange}
+                    onRemove={meds.handleRemove}
+                  />
+                ))}
+              </ScrollView>
 
               {/* Select All, Cost, Buy Bar */}
               <View style={styles.bottomBar}>
                 <Row style={styles.bottomRow}>
-                  <Row style={styles.selectAllSection}>
-                    <TouchableOpacity 
-                      onPress={meds.handleSelectAll}
-                      style={styles.selectAllBtn}
-                    >
-                      <Ionicons 
-                        name={isAllSelected ? "checkbox" : "square-outline"} 
-                        size={21} 
-                        color="#222" 
-                      />
-                    </TouchableOpacity>
-                    <RText style={styles.selectAllText}>Select all</RText>
-                  </Row>
-                  
                   <View style={styles.costSection}>
                     <RText style={styles.costLabel}>Total:</RText>
                     <RText style={styles.costText}>
-                      {formatPrice(totalCost)}
+                      {formatPrice(meds.calculateTotal())}
                     </RText>
                   </View>
                   
@@ -88,17 +62,17 @@ export function Cart() {
                       onPress: meds.handleBuyPress, 
                       style: [
                         styles.buyBtn, 
-                        !hasSelectedItems && styles.buyBtnDisabled
+                        !cartItems.length && styles.buyBtnDisabled
                       ],
-                      disabled: !hasSelectedItems || isLoading
+                      disabled: !cartItems.length || isLoading
                     }} 
                     _type="Fill"
                   >
-                    <RText style={[
-                      styles.buyText,
-                      !hasSelectedItems && styles.buyTextDisabled
-                    ]}>
-                      {isLoading ? "Processing..." : "Buy"}
+                    <RText style={
+                     
+                         styles.buyText
+                    }>
+                      {isLoading ? "Processing..." : "Checkout"}
                     </RText>
                   </Button>
                 </Row>
@@ -177,7 +151,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row', 
     alignItems: 'center', 
     justifyContent: 'space-between', 
-    padding: 16, 
+    paddingHorizontal: 16,
+    paddingVertical: 8, 
     borderTopWidth: 1, 
     borderColor: '#eee', 
     backgroundColor: '#fff', 
@@ -215,20 +190,21 @@ const styles = StyleSheet.create({
     color: '#222' 
   },
   buyBtn: { 
-    backgroundColor: '#F9CACA', 
+    backgroundColor: init.Color.PrimaryBrand, 
     borderRadius: 8, 
-    paddingVertical: 12, 
+    paddingVertical: 8, 
     paddingHorizontal: 24,
     minWidth: 80,
+    height: 40,
     alignItems: 'center',
   }, 
   buyBtnDisabled: {
     backgroundColor: '#ddd',
   },
   buyText: { 
-    color: '#222', 
+    color: init.Color.Whites, 
     fontWeight: 'bold', 
-    fontSize: 18 
+    fontSize: 14 
   },
   buyTextDisabled: {
     color: '#999',

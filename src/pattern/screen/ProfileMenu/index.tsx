@@ -9,13 +9,13 @@ export function ProfileMenu() {
       <Context.Consumer>
         {({ ss }) => {
           // UserInfo may be present or not, fallback to mock if not
-          const user = (ss.Auth && 'UserInfo' in ss.Auth && ss.Auth.UserInfo && (ss.Auth.UserInfo as any).name)
-            ? ss.Auth.UserInfo as { name: string; phone: string; points: number }
+          const user = (ss.Joint && 'User' in ss.Joint && ss.Joint.User)
+            ? ss.Joint.User
             : { name: "Nguyen Kheu Anh Wuan", phone: "025 555 5555", points: 1280 };
           return (
             <Container style={{ backgroundColor: '#fff', flex: 1, padding: 0 }}>
               <ScrollView style={{ flex: 1 }}>
-                <ProfileCard name={user.name} phone={user.phone} points={user.points} />
+                <ProfileCard name={user.name} phone={'025 555 5555'} />
                 <View style={styles.menuBox}>
                   <Button _set={{ onPress: () => {} }} _type="Stroke"><RText>View purchase history</RText></Button>
                   <Button _set={{ onPress: () => {} }} _type="Stroke"><RText>Tracking order</RText></Button>

@@ -5,6 +5,7 @@ import { AxiosResponse } from "axios";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import Toast from "react-native-toast-message";
 
 export default GenCtx({
   useLogic() {
@@ -50,6 +51,11 @@ export default GenCtx({
               productId: productId,
               quantity: quantity ?? 1,
             },
+          });
+
+          Toast.show({
+            type: "success",
+            text1: "Added to cart!",
           });
         } catch (error) {
           onError({ error });

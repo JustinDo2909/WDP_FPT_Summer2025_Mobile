@@ -1,22 +1,20 @@
 import { ICartLineItem } from "@/assets/types/cart";
-import { Card, Column, Row, RText } from "@/src/libs/by";
+import { Button, Card, Column, Row, RText } from "@/src/libs/by";
 import { calculateDiscount } from "@/src/libs/share/calcDiscount";
 import { formatPrice } from "@/src/libs/share/formatPrice";
 import { Ionicons } from '@expo/vector-icons';
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 
-export function CartItem({ item, selected, onSelect }: {
+export function CartItem({ item, onQuantityChange, onRemove }: {
   item: ICartLineItem;
-  selected: boolean;
-  onSelect: (id: number) => void;
+  onQuantityChange: (id: number, newQty: number) => void;
+  onRemove: (id: number) => void;
 }) {
   const { product, quantity } = item;
+  const inStock = product.total_stock ?? 0;
   return (
     <Card style={styles.card}>
       <Row style={{ alignItems: 'flex-start', gap: 12 }}>
-        <TouchableOpacity onPress={() => onSelect(item.id)}>
-          <Ionicons name={selected ? "checkbox" : "square-outline"} size={28} color={selected ? "#F23059" : "#bbb"} />
-        </TouchableOpacity>
         <Image source={{ uri: product.image_url }} style={styles.image} />
         <Column style={{ flex: 1, gap: 4 }}>
           <RText style={styles.title}>{product.title}</RText>
@@ -32,7 +30,18 @@ export function CartItem({ item, selected, onSelect }: {
               <RText style={styles.oldPrice}>{formatPrice(product.price)}</RText>
             )}
           </Row>
-          <RText style={styles.qty}>Qty: {quantity}</RText>
+          <Row style={{ alignItems: 'center', gap: 8, marginTop: 4 }}>
+            <Button _type="Icon" _set={{ onPress: () => onQuantityChange(item.id, Math.max(1, quantity - 1)), style: styles.qtyBtn, disabled: quantity <= 1 }}>
+              <RText style={styles.qtyBtnText}>-</RText>
+            </Button>
+            <RText style={styles.qty}>{quantity}</RText>
+            <Button _type="Icon" _set={{ onPress: () => onQuantityChange(item.id, Math.min(inStock, quantity + 1)), style: styles.qtyBtn, disabled: quantity >= inStock }}>
+              <RText style={styles.qtyBtnText}>+</RText>
+            </Button>
+            <Button _type="Icon" _set={{ onPress: () => onRemove(item.id), style: styles.removeBtn }}>
+              <Ionicons name="trash-outline" size={20} color="#F23059" />
+            </Button>
+          </Row>
         </Column>
       </Row>
     </Card>
@@ -48,5 +57,8 @@ const styles = StyleSheet.create({
   discountText: { color: '#fff', fontWeight: 'bold', fontSize: 12 },
   price: { color: '#F23059', fontWeight: 'bold', fontSize: 18 },
   oldPrice: { color: '#bbb', textDecorationLine: 'line-through', fontSize: 14, marginLeft: 6 },
-  qty: { color: '#666', fontSize: 15, marginTop: 4 },
+  qty: { color: '#666', fontSize: 15, marginHorizontal: 8 },
+  qtyBtn: { backgroundColor: '#eee', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2 },
+  qtyBtnText: { fontSize: 18, color: '#F23059', fontWeight: 'bold' },
+  removeBtn: { marginLeft: 8, backgroundColor: '#fff' },
 });

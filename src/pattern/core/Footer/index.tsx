@@ -13,7 +13,7 @@ const tabs = [
   { key: "Game", label: "Game", icon: <FontAwesome5 name="gamepad" size={22} color="black" /> },
   // You can use "party-popper" from MaterialCommunityIcons for a confetti party popper icon
   { key: "Event", label: "Event", icon: <MaterialCommunityIcons name="party-popper" size={24} color="black" /> },
-  { key: "Me", label: "Me", icon: <Ionicons name="person" size={24} color="black" /> },
+  { key: "ProfileMenu", label: "Me", icon: <Ionicons name="person" size={24} color="black" /> },
 ];
 
 export function Footer() {
