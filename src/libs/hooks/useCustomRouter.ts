@@ -8,14 +8,10 @@ interface NavigateOptions {
 export const useCustomRouter = () => {
   const router = useRouter();
 
-  const navigate = ({
-    pathSegments = [],
-    params = {},
-  }: NavigateOptions) => {
+  const navigate = ({ pathSegments = [], params = {} }: NavigateOptions) => {
     const path = "/" + pathSegments.map(String).join("/");
-
     const queryParams = new URLSearchParams({ path, ...params }).toString();
-    router.push(`/root/dynamic?${queryParams}`);
+    router.push(`/root/dynamic?${queryParams}` as any);
   };
 
   return { navigate };
