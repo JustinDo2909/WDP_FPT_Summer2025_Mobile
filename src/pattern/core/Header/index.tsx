@@ -96,7 +96,7 @@ export function Header() {
       >
         <RenderTitle />
 
-        {(ss.Pick?.NavHeading !== "Shopping Cart" && ss.Pick?.NavHeading !== "Checkout") && (
+        {(ss.Pick?.NavHeading !== "Shopping Cart" && ss.Pick?.NavHeading !== "Checkout" && ss.Pick?.NavHeading !== "History Purchase")  && (
           <>
             <View
               style={{
