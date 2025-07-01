@@ -2,10 +2,12 @@ import { StateCreator } from "zustand";
 
 export type State = {
   Joint: {
-    Product? : IProduct,
-    Products? : IProduct[],
-    Cart?: ICart,
-    User?: IUser
+    Product?: IProduct;
+    Products?: IProduct[];
+    Cart?: ICart;
+    User?: IUser;
+    QuizQuestions?: QuizQuestion[];
+    EventReward?: EventReward[];
   };
   setJointData(Obj: State["Joint"]): void;
   resetJoint(): void;

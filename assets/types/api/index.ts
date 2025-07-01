@@ -25,13 +25,18 @@ declare global {
   };
 
   type IListResponse<T, N extends string> = Record<N, T[]> & {
-        success: boolean;
-  }
+    success: boolean;
+  };
 
   type IResponse<T, N extends string> = Record<N, T> & {
-        success: boolean;
-  }
+    success: boolean;
+  };
+
+  type IQuestionResponse<T, N extends string> = Record<N, T[]> & {
+    success: boolean;
+  };
+
+  type IEventRewardResponse<T, N extends string> = Record<N, T[]> & {
+    success: boolean;
+  };
 }
-   
-
-
