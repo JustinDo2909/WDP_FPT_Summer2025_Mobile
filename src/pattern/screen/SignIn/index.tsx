@@ -137,14 +137,14 @@ export function SignIn() {
                       </View>
 
                       {/* Divider */}
-                      <View style={styles.dividerContainer}>
+                      {/* <View style={styles.dividerContainer}>
                         <View style={styles.dividerLine} />
                         <RText style={styles.dividerText}>or</RText>
                         <View style={styles.dividerLine} />
-                      </View>
+                      </View> */}
 
                       {/* Social Login Button */}
-                      <View style={styles.buttonWrapper}>
+                      {/* <View style={styles.buttonWrapper}>
                         <Button
                           _type="Stroke"
                           _set={{
@@ -159,7 +159,7 @@ export function SignIn() {
                             </RText>
                           </View>
                         </Button>
-                      </View>
+                      </View> */}
 
                       {/* Sign Up Section */}
                       <View style={styles.signUpSection}>

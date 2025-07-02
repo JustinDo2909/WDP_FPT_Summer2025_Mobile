@@ -3,7 +3,7 @@ import { onCRUD, onError } from "@/src/process/api/regular";
 import { GenCtx } from "@/src/process/hooks";
 import { sStore } from "@/src/stores";
 import { AxiosResponse } from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "react-native";
 
@@ -22,6 +22,11 @@ export default GenCtx({
 
     const cart = ss.Joint?.Cart;
     const { navigate } = useCustomRouter();
+
+    const debounceTime = 500; // 500 milliseconds
+    // useRef to store active timeouts for each product ID
+    const timeoutRefs = useRef<{ [productId: string]: NodeJS.Timeout }>({});
+
 
     // Remove selection logic, all items are checkoutable by default
 
@@ -72,9 +77,29 @@ export default GenCtx({
       handleQuantityChange: (id: number, newQty: number) => {
         const item = cart?.cartItems?.find(i => i.id === id);
         if (!item) return;
+
         const inStock = item.product.total_stock ?? 0;
         if (newQty < 1 || newQty > inStock) return;
-        meds.onPutCart({ productId: item.product_id, quantity: newQty });
+
+        // Clear any existing timeout for this specific product ID
+        if (timeoutRefs.current[item.product_id]) {
+          clearTimeout(timeoutRefs.current[item.product_id]);
+        }
+
+        // Set a new timeout to call the API after the debounceTime
+        timeoutRefs.current[item.product_id] = setTimeout(() => {
+          meds.onPutCart({ productId: item.product_id, quantity: newQty });
+        }, debounceTime);
+
+        // Optionally, you might want to optimistically update the UI here
+        // to make the experience feel snappier, before the API call confirms.
+        // For example:
+        if (ss.setJointData && cart) {
+          const updatedCartItems = cart.cartItems.map(cartItem =>
+            cartItem.id === id ? { ...cartItem, quantity: newQty } : cartItem
+          );
+          ss.setJointData({ Cart: { ...cart, cartItems: updatedCartItems } });
+        }
       },
 
       handleRemove: (id: number) => {

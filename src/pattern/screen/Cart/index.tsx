@@ -13,7 +13,7 @@ export function Cart() {
         {({ ss, cart, meds, isLoading }) => {
           const cartItems = cart?.cartItems ?? [];
           return (
-            <Container style={{ backgroundColor: '#fff', flex: 1, paddingBottom: 0 }}>
+            <Container style={{ backgroundColor: '#f5f5f5', flex: 1, paddingBottom: 0 }}>
               {/* <Header title="My Cart" /> */}
 
               {/* Voucher Bar */}
@@ -87,7 +87,7 @@ export function Cart() {
 
 const styles = StyleSheet.create({
   container: { 
-    backgroundColor: '#fff', 
+    backgroundColor: '#f5f5f5', 
     flex: 1, 
     padding: 0 
   },

@@ -32,8 +32,8 @@ export function CartItems({ items }: { items: ICartLineItem[] }) {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16 },
-  card: { marginBottom: 10, borderRadius: 8, padding: 12, backgroundColor: '#ffffff' },
+  container: { paddingHorizontal: 16, paddingVertical: 0, },
+  card: { marginBottom: 8, borderRadius: 8, padding: 12, backgroundColor: '#ffffff' },
   row: { flexDirection: 'row', alignItems: 'center' },
   thumbnail: { width: 48, height: 48, borderRadius: 8, marginRight: 12, backgroundColor: '#eee' },
   title: { fontWeight: 'bold', fontSize: 16 },
