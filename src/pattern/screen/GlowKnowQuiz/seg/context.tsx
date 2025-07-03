@@ -2,7 +2,7 @@ import { onCRUD, onError } from "@/src/process/api/regular";
 import { GenCtx } from "@/src/process/hooks";
 import { sStore } from "@/src/stores";
 import { AxiosResponse } from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Toast from "react-native-toast-message";
 
@@ -16,6 +16,8 @@ export default GenCtx({
         filters: {},
       },
     });
+
+    const [hasStarted, setHasStarted] = useState<boolean>(false);
 
     const meds = {
       //#region getRandomQuestions
@@ -61,19 +63,19 @@ export default GenCtx({
 
       //#region playEvent
       async playGame() {
-        try {
-          await onCRUD({
-            Name: "events/play",
-          }).Post({
-            payload: {},
-          });
-          Toast.show({
-            type: "success",
-            text1: "Play Game successful",
-          });
-        } catch (error) {
-          onError({ error });
-        }
+        // try {
+        //   await onCRUD({
+        //     Name: "events/play",
+        //   }).Post({
+        //     payload: {},
+        //   });
+        Toast.show({
+          type: "success",
+          text1: "Play Game successful",
+        });
+        // } catch (error) {
+        //   onError({ error });
+        // }
       },
 
       // #region
@@ -92,6 +94,10 @@ export default GenCtx({
       },
       // #endregion
       //#endregion
+      handlePlayGame() {
+        setHasStarted(true);
+        meds.playGame();
+      },
     };
 
     //#region LifeCycle
@@ -104,6 +110,6 @@ export default GenCtx({
 
     //#endregion
 
-    return { meds, methods, ss };
+    return { meds, methods, ss, hasStarted };
   },
 });
