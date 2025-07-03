@@ -2,6 +2,7 @@ import React from "react";
 import { FlatList, StyleSheet, View, TouchableOpacity, Image } from "react-native";
 import { RText } from "@/src/libs/by";
 import { formatPrice } from "@/src/libs/share/formatPrice";
+import { VoucherCard } from "@/src/pattern/share/VoucherCard";
 
 export function VoucherPicker({ vouchers, onSelect, selectedId }: {
   vouchers: IVoucher[];
@@ -14,33 +15,7 @@ export function VoucherPicker({ vouchers, onSelect, selectedId }: {
         data={vouchers}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => onSelect(item)}
-            style={[
-              styles.card,
-              item.id === selectedId ? styles.cardSelected : styles.cardUnselected
-            ]}
-            activeOpacity={0.7}
-          >
-            {/* Hot Sale Icon */}
-            <View style={styles.iconContainer}>
-              <Image
-              source={require('@/assets/images/hot-sale.png')}
-              style={styles.hotSaleIcon}
-              />
-            </View>
-
-            <View style={styles.cardContent}>
-              <RText style={styles.cardDiscountText}>{formatDiscount(item)}</RText>
-              {item.redeemed_at && (
-                <RText style={styles.cardRedeemedText}>Đã sử dụng vào: {item.redeemed_at}</RText>
-              )}
-              <View style={styles.divider} />
-              {/* <RText style={styles.cardDescription}>
-                {item.description || "Không có mô tả."}
-              </RText> */}
-            </View>
-          </TouchableOpacity>
+          <VoucherCard onUse={onSelect} voucher={item} buttonText="Apply"/>
         )}
       />
     </View>

@@ -6,11 +6,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, Linking } from "react-native";
 import Toast from "react-native-toast-message"; // Assuming Toast is used
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
+import * as WebBrowser from "expo-web-browser";
 
-const { GHN_API_TOKEN, GHN_CLIENT_ID, GHN_SHOP_ID } = Constants.expoConfig?.extra ?? {};
-
-
+const { GHN_API_TOKEN, GHN_CLIENT_ID, GHN_SHOP_ID } =
+  Constants.expoConfig?.extra ?? {};
 
 // Assuming IVoucher, IAddress, ICartItem, etc., are globally declared
 
@@ -55,6 +55,21 @@ export default GenCtx({
     const [vouchers, setVouchers] = useState<IVoucher[]>([]);
     const [shippingFee, setShippingFee] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+
+    const [shippingInfo, setShippingInfo] = useState<Partial<IAddress>>({
+      user_id: "",
+      address: "",
+      city: "",
+      to_city_id: "",
+      to_district_id: "",
+      to_ward_code: "",
+      pincode: "",
+      phone: "",
+      notes: "",
+      fullname: "",
+      district: "",
+      ward: "",
+    });
 
     const cart = ss.Joint?.Cart;
     const cartItems = cart?.cartItems || [];
@@ -106,14 +121,58 @@ export default GenCtx({
       },
       //#endregion
 
+      //#region AddAddresses
+      async onAddAddress({ fields }: IForm) {
+        try {
+          setIsLoading(true);
+
+          await onCRUD({ Name: "addresses/add" }).Post({
+            payload: {
+              address: fields.address,
+              city: shippingInfo.city,
+              to_city_id: shippingInfo.to_city_id,
+              to_district_id: shippingInfo.to_district_id,
+              to_ward_code: shippingInfo.to_ward_code,
+              pincode: fields.pincode,
+              phone: fields.phone,
+              notes: fields.notes,
+              // district: shippingInfo.district,
+              // ward: shippingInfo.ward,
+            },
+          });
+
+          await meds.onGetAddresses();
+
+          setShowAddAddress(false);
+          setShowAddressPicker(true);
+        } catch (error) {
+          onError({ error });
+          Toast.show({
+            type: "error",
+            text1: "Lỗi",
+            text2: "Không thể thêm địa chỉ mới.",
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      },
+
+      //#endregion
+
       //#region GHNAPI
       async onGetProvinces() {
         try {
           const { data }: AxiosResponse<any> = await onCRUD({
             Name: "master-data/province",
-                        BaseURL: "https://online-gateway.ghn.vn/shiip/public-api/"
-
-          }).Get({});
+            BaseURL: "https://online-gateway.ghn.vn/shiip/public-api",
+          }).Get({
+            config: {
+              headers: {
+                Token: GHN_API_TOKEN,
+                ShopId: GHN_SHOP_ID,
+              },
+            },
+          });
           if (data?.data) {
             return data.data.map((item: any) => ({
               name: item.ProvinceName,
@@ -136,9 +195,15 @@ export default GenCtx({
         try {
           const { data }: AxiosResponse<any> = await onCRUD({
             Name: `master-data/district?province_id=${provinceId}`,
-                        BaseURL: "https://online-gateway.ghn.vn/shiip/public-api/"
-
-          }).Get({});
+            BaseURL: "https://online-gateway.ghn.vn/shiip/public-api",
+          }).Get({
+            config: {
+              headers: {
+                Token: GHN_API_TOKEN,
+                ShopId: GHN_SHOP_ID,
+              },
+            },
+          });
           if (data?.data) {
             return data.data.map((item: any) => ({
               name: item.DistrictName,
@@ -160,10 +225,16 @@ export default GenCtx({
       async onGetWards(districtId: number) {
         try {
           const { data }: AxiosResponse<any> = await onCRUD({
-            Name: `/master-data/ward?district_id=${districtId}`,
-                        BaseURL: "https://online-gateway.ghn.vn/shiip/public-api/"
-
-          }).Get({});
+            Name: `master-data/ward?district_id=${districtId}`,
+            BaseURL: "https://online-gateway.ghn.vn/shiip/public-api",
+          }).Get({
+            config: {
+              headers: {
+                Token: GHN_API_TOKEN,
+                ShopId: GHN_SHOP_ID,
+              },
+            },
+          });
           if (data?.data) {
             return data.data.map((item: any) => ({
               name: item.WardName,
@@ -188,44 +259,37 @@ export default GenCtx({
       ): Promise<number | null> {
         try {
           const payload = {
-        service_id: 53320,
-        service_type_id: null,
-        to_district_id: Number(to_district_id),
-        to_ward_code: to_ward_code,
-        weight: 100,
-        items: ss.Joint.Cart?.cartItems.map((item) => ({
-          name: item.product.title,
-          quantity: item.quantity,
-        })),
+            service_id: 53320,
+            service_type_id: null,
+            to_district_id: Number(to_district_id),
+            to_ward_code: to_ward_code,
+            weight: 100,
+            items: ss.Joint.Cart?.cartItems.map((item) => ({
+              name: item.product.title,
+              quantity: item.quantity,
+            })),
           };
 
-          const headers = new Headers();
-          headers.set(
-        "Token",
-        process.env.GHN_API_TOKEN || "2097f4fe-1bfe-11f0-8aaa-9ed348b01f47"
-          );
-          headers.set("ShopId", process.env.GHN_SHOP_ID || "5738915");
-
           const { data }: AxiosResponse<any> = await onCRUD({
-        Name: "/v2/shipping-order/fee",
-        BaseURL: "https://online-gateway.ghn.vn/shiip/public-api/",
+            Name: "v2/shipping-order/fee",
+            BaseURL: "https://online-gateway.ghn.vn/shiip/public-api",
           }).Post({
-        payload,
-        config: {
-    headers: {
-      Token: GHN_API_TOKEN,
-      ShopId: GHN_SHOP_ID,
-    },
-  },
+            payload,
+            config: {
+              headers: {
+                Token: GHN_API_TOKEN,
+                ShopId: GHN_SHOP_ID,
+              },
+            },
           });
 
-          return data.total;
+          setShippingFee(data.data.total)
         } catch (error) {
           onError({ error });
           Toast.show({
-        type: "error",
-        text1: "Lỗi",
-        text2: "Không thể tính phí vận chuyển.",
+            type: "error",
+            text1: "Lỗi",
+            text2: "Không thể tính phí vận chuyển.",
           });
           return null;
         }
@@ -236,16 +300,16 @@ export default GenCtx({
       async onGetVouchers() {
         try {
           const { data }: AxiosResponse<{ vouchers: IVoucher[] }> =
-        await onCRUD({ Name: "vouchers" }).Get({});
+            await onCRUD({ Name: "vouchers" }).Get({});
           if (data?.vouchers) {
-        setVouchers(data.vouchers);
+            setVouchers(data.vouchers);
           }
         } catch (error) {
           onError({ error });
           Toast.show({
-        type: "error",
-        text1: "Lỗi",
-        text2: "Không thể tải danh sách voucher.",
+            type: "error",
+            text1: "Lỗi",
+            text2: "Không thể tải danh sách voucher.",
           });
         }
       },
@@ -269,22 +333,19 @@ export default GenCtx({
           }).Post({
             payload: {
               addressId: selectedAddress.id,
-              voucherId: selectedVoucher?.stripe_coupon_id,
+              couponId: selectedVoucher?.stripe_coupon_id,
               shippingCost: shippingFee,
+              // isMobile: true,
             },
           });
           if (data?.url) {
-            // Open Stripe checkout URL in browser
-            Linking.openURL(data.url)
+            WebBrowser.openBrowserAsync(data.url)
               .then(() => {
-                // Optionally, listen for deep link/callback here for real-world apps
-                // For now, show a message and navigate to success
                 Alert.alert(
                   "Chuyển hướng thanh toán",
                   "Bạn đang được chuyển đến trang thanh toán Stripe."
                 );
                 // Clear cart after successful order
-                ss.setJointData({ Cart: undefined });
                 // Navigate to success page (replace with your navigation logic)
                 // Example: navigation.navigate('CheckoutSuccess');
               })
@@ -297,13 +358,6 @@ export default GenCtx({
                 // Navigate to error page (replace with your navigation logic)
                 // Example: navigation.navigate('CheckoutError');
               });
-          } else {
-            Toast.show({
-              type: "error",
-              text1: "Lỗi đặt hàng",
-              text2: "Không nhận được URL thanh toán.",
-            });
-            // Optionally navigate to error page
           }
         } catch (error) {
           onError({ error });
@@ -354,7 +408,7 @@ export default GenCtx({
     // Shipping fee logic
     useEffect(() => {
       if (selectedAddress) {
-        setShippingFee(30000); // 30k VND
+        meds.onGetShippingFee(Number(selectedAddress.to_district_id), String(selectedAddress.to_ward_code))
       } else {
         setShippingFee(null);
       }
@@ -390,7 +444,9 @@ export default GenCtx({
       setShowAddAddress,
       setSelectedVoucher,
       setShowVoucherPicker,
+      setShippingInfo,
       setIsLoading, // If you need to manually control loading from outside
+      shippingInfo,
     };
   },
 });

@@ -49,7 +49,7 @@ export function Container({ style, children, ...args }: ViewProps) {
 // region Area - cấp 3
 export function Area({ style, children, ...args }: ViewProps) {
   return (
-    <View id="Area" style={StyleSheet.flatten([ style])} {...args}>
+    <View id="Area" style={StyleSheet.flatten([style])} {...args}>
       {children}
     </View>
   );
@@ -59,7 +59,7 @@ export function Area({ style, children, ...args }: ViewProps) {
 // region Yard - cấp 4
 export function Yard({ style, children, ...args }: ViewProps) {
   return (
-    <View id="Yard" style={StyleSheet.flatten([ style])} {...args}>
+    <View id="Yard" style={StyleSheet.flatten([style])} {...args}>
       {children}
     </View>
   );
@@ -69,11 +69,7 @@ export function Yard({ style, children, ...args }: ViewProps) {
 // region Section - cấp 5
 export function Section({ style, children, ...args }: ViewProps) {
   return (
-    <View
-      id="Section"
-      style={StyleSheet.flatten([ style])}
-      {...args}
-    >
+    <View id="Section" style={StyleSheet.flatten([style])} {...args}>
       {children}
     </View>
   );
@@ -83,7 +79,7 @@ export function Section({ style, children, ...args }: ViewProps) {
 // region Anchor - cấp 6
 export function Anchor({ style, children, ...args }: ViewProps) {
   return (
-    <View id="Anchor" style={StyleSheet.flatten([ style])} {...args}>
+    <View id="Anchor" style={StyleSheet.flatten([style])} {...args}>
       {children}
     </View>
   );
@@ -93,7 +89,7 @@ export function Anchor({ style, children, ...args }: ViewProps) {
 // region Block - cấp 7
 export function Block({ style, children, ...args }: ViewProps) {
   return (
-    <View id="Block" style={StyleSheet.flatten([ style])} {...args}>
+    <View id="Block" style={StyleSheet.flatten([style])} {...args}>
       {children}
     </View>
   );
@@ -133,7 +129,7 @@ export function Card({ style, children, ...args }: ViewProps) {
 // region Box - cấp 8
 export function Box({ style, children, ...args }: ViewProps) {
   return (
-    <View id="Box" style={StyleSheet.flatten([ style])} {...args}>
+    <View id="Box" style={StyleSheet.flatten([style])} {...args}>
       {children}
     </View>
   );
@@ -257,7 +253,7 @@ export function Scroll({ style, children, ...args }: ViewProps) {
 // region Mass
 export function Mass({ style, children, ...args }: ViewProps) {
   return (
-    <View id="Mass" style={StyleSheet.flatten([ style])} {...args}>
+    <View id="Mass" style={StyleSheet.flatten([style])} {...args}>
       {children}
     </View>
   );

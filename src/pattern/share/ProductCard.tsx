@@ -105,7 +105,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, cardWidth }) => {
             }>
               <Row style={styles.cartRow}>
                 {/* <RText style={styles.cartText}>Add To Cart</RText> */}
-                <MaterialIcons name="shopping-basket" size={18} color="#6366f1" />
+                <MaterialIcons name="shopping-basket" size={24} color="#6366f1" />
               </Row>
             </TouchableOpacity>
             {/* </AddToCartWrapper> */}

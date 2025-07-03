@@ -1,28 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, TextInput, View, Text, TouchableOpacity, ActivityIndicator, ScrollView } from "react-native";
+import { Button, FieldText, RText } from "@/src/libs/by";
 import { Picker } from "@react-native-picker/picker";
-import { RText, Button } from "@/src/libs/by";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import context from "./context"; // Adjust if your context hook is named differently
 
 
 export function AddAddressForm({ onSave, initialShippingInfo }: { onSave: (address: IAddress) => void; initialShippingInfo?: IAddress }) {
-  const [shippingInfo, setShippingInfo] = useState<Partial<IAddress>>(
-    initialShippingInfo || {
-      user_id: "",
-      address: "",
-      city: "",
-      to_city_id: "",
-      to_district_id: "",
-      to_ward_code: "",
-      pincode: "",
-      phone: "",
-      notes: "",
-      fullname: "",
-      district: "",
-      ward: "",
-    }
-  );
-  const { meds, ss,  methods: { handleSubmit }, isLoading, setShowAddressPicker } = context.useCtx();
+  const { meds, ss,  methods: { handleSubmit }, isLoading, setShowAddAddress, setShippingInfo, shippingInfo } = context.useCtx();
 
 
   const [errors, setErrors] = useState<{ [k: string]: string }>({});
@@ -35,6 +19,7 @@ export function AddAddressForm({ onSave, initialShippingInfo }: { onSave: (addre
 
   // Fetch provinces
   useEffect(() => {
+    if (initialShippingInfo) setShippingInfo(initialShippingInfo)
     setLoadingProvinces(true);
     meds.onGetProvinces().then((data) => {
       setProvinces(data || []);
@@ -115,22 +100,23 @@ export function AddAddressForm({ onSave, initialShippingInfo }: { onSave: (addre
       <View style={styles.row}>
         <View style={styles.flex1}>
           <RText style={styles.label}>Full Name</RText>
-          <TextInput
-            style={[styles.input, errors.fullname && styles.inputError]}
+          <FieldText
+            name="fields.fullname"
+            style={{ input: [styles.input, errors.fullname && styles.inputError] }}
             placeholder="Enter full name"
             value={shippingInfo.fullname || ""}
-            onChangeText={(v) => setShippingInfo({ ...shippingInfo, fullname: v })}
+            onChange={(v: string) => setShippingInfo({ ...shippingInfo, fullname: v })}
           />
           {errors.fullname && <Text style={styles.error}>{errors.fullname}</Text>}
         </View>
         <View style={styles.flex1}>
           <RText style={styles.label}>Phone</RText>
-          <TextInput
-            style={[styles.input, errors.phone && styles.inputError]}
+          <FieldText
+            name="fields.phone"
+            style={{ input: [styles.input, errors.phone && styles.inputError] }}
             placeholder="Enter phone number"
             value={shippingInfo.phone || ""}
-            onChangeText={(v) => setShippingInfo({ ...shippingInfo, phone: v })}
-            keyboardType="phone-pad"
+            onChange={(v: string) => setShippingInfo({ ...shippingInfo, phone: v })}
           />
           {errors.phone && <Text style={styles.error}>{errors.phone}</Text>}
         </View>
@@ -139,11 +125,12 @@ export function AddAddressForm({ onSave, initialShippingInfo }: { onSave: (addre
       <View style={styles.row}>
         <View style={styles.flex1}>
           <RText style={styles.label}>Province/City</RText>
-          <View style={[styles.pickerWrapper, errors.city && styles.inputError]}>
+          <View style={[ errors.city && styles.inputError]}>
             {loadingProvinces ? (
               <ActivityIndicator size="small" color="#F23059" />
             ) : (
               <Picker
+                style={styles.picker}
                 selectedValue={shippingInfo.to_city_id || ""}
                 onValueChange={(val) => {
                   const selected = provinces.find((p) => p.codeId === val);
@@ -165,13 +152,12 @@ export function AddAddressForm({ onSave, initialShippingInfo }: { onSave: (addre
         </View>
         <View style={styles.flex1}>
           <RText style={styles.label}>PIN Code</RText>
-          <TextInput
-            style={[styles.input, errors.pincode && styles.inputError]}
+          <FieldText
+            name="fields.pincode"
+            style={{ input: [styles.input, errors.pincode && styles.inputError] }}
             placeholder="Enter PIN code"
             value={shippingInfo.pincode || ""}
-            onChangeText={(v) => setShippingInfo({ ...shippingInfo, pincode: v })}
-            keyboardType="number-pad"
-            maxLength={6}
+            onChange={(v: string) => setShippingInfo({ ...shippingInfo, pincode: v })}
           />
           {errors.pincode && <Text style={styles.error}>{errors.pincode}</Text>}
         </View>
@@ -179,11 +165,12 @@ export function AddAddressForm({ onSave, initialShippingInfo }: { onSave: (addre
       {/* District */}
       <View style={styles.flex1}>
         <RText style={styles.label}>District</RText>
-        <View style={[styles.pickerWrapper, errors.district && styles.inputError]}>
+        <View style={[ errors.district && styles.inputError]}>
           {loadingDistricts ? (
             <ActivityIndicator size="small" color="#F23059" />
           ) : (
             <Picker
+              style={styles.picker}
               selectedValue={shippingInfo.to_district_id || ""}
               enabled={!!shippingInfo.to_city_id}
               onValueChange={(val) => {
@@ -207,11 +194,12 @@ export function AddAddressForm({ onSave, initialShippingInfo }: { onSave: (addre
       {/* Ward */}
       <View style={styles.flex1}>
         <RText style={styles.label}>Ward</RText>
-        <View style={[styles.pickerWrapper, errors.ward && styles.inputError]}>
+        <View style={[errors.ward && styles.inputError]}>
           {loadingWards ? (
             <ActivityIndicator size="small" color="#F23059" />
           ) : (
             <Picker
+              style={styles.picker}
               selectedValue={shippingInfo.to_ward_code || ""}
               enabled={!!shippingInfo.to_district_id}
               onValueChange={(val) => {
@@ -235,34 +223,36 @@ export function AddAddressForm({ onSave, initialShippingInfo }: { onSave: (addre
       {/* Street Address */}
       <View style={styles.flex1}>
         <RText style={styles.label}>Street Address</RText>
-        <TextInput
-          style={[styles.input, errors.address && styles.inputError]}
+        <FieldText
+          name="fields.address"
+          style={{ input: [styles.input, errors.address && styles.inputError] }}
           placeholder="Street number + street name"
           value={shippingInfo.address || ""}
-          onChangeText={(v) => setShippingInfo({ ...shippingInfo, address: v })}
+          onChange={(v: string) => setShippingInfo({ ...shippingInfo, address: v })}
         />
         {errors.address && <Text style={styles.error}>{errors.address}</Text>}
       </View>
       {/* Notes */}
       <View style={styles.flex1}>
         <RText style={styles.label}>Notes</RText>
-        <TextInput
-          style={styles.input}
+        <FieldText
+          name="fields.notes"
+          style={{ input: styles.input }}
           placeholder="Add a note (optional)"
           value={shippingInfo.notes || ""}
-          onChangeText={(v) => setShippingInfo({ ...shippingInfo, notes: v })}
+          onChange={(v: string) => setShippingInfo({ ...shippingInfo, notes: v })}
         />
       </View>
       {/* Buttons */}
       <View style={styles.buttonRow}>
-        <TouchableOpacity style={[styles.button, styles.cancelBtn]} onPress={() => setShowAddressPicker(false)} disabled={isLoading}>
+        <TouchableOpacity style={[styles.button, styles.cancelBtn]} onPress={() => setShowAddAddress(false)} disabled={isLoading}>
           <RText style={styles.cancelText}>Cancel</RText>
         </TouchableOpacity>
         <Button
           _type="Fill"
           _set={{
             onPress: () => {
-              handleSubmit(meds.onGetShippingFee)()
+              handleSubmit(meds.onAddAddress)()
             },
             style: [styles.button, styles.saveBtn, isLoading && { opacity: 0.7 }],
             disabled: isLoading,
@@ -284,11 +274,11 @@ const styles = StyleSheet.create({
   error: { color: "#F23059", fontSize: 12, marginBottom: 2 },
   row: { flexDirection: "row", gap: 12 },
   flex1: { flex: 1, minWidth: 0 },
-  pickerWrapper: { borderWidth: 1, borderColor: "#ccc", borderRadius: 8, backgroundColor: "#f9f9f9", marginBottom: 4 },
+  picker: { height: 40, width: "100%", backgroundColor: "transparent" },
   buttonRow: { flexDirection: "row", justifyContent: "flex-end", gap: 12, marginTop: 16 },
-  button: { borderRadius: 8, paddingVertical: 12, paddingHorizontal: 24 },
-  cancelBtn: { backgroundColor: "#eee", marginRight: 8 },
-  saveBtn: { backgroundColor: "#F23059" },
+  button: { borderRadius: 8, paddingVertical: 12, paddingHorizontal: 24, backgroundColor: "#F23059", shadowColor: "transparent", elevation: 0 },
+  cancelBtn: { backgroundColor: "#eee", marginRight: 8, shadowColor: "transparent", elevation: 0 },
+  saveBtn: { backgroundColor: "#F23059", shadowColor: "transparent", elevation: 0 },
   cancelText: { color: "#333", fontWeight: "bold" },
   saveText: { color: "#fff", fontWeight: "bold" },
 });

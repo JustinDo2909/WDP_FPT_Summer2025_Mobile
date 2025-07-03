@@ -13,7 +13,7 @@ export function Cart() {
         {({ ss, cart, meds, isLoading }) => {
           const cartItems = cart?.cartItems ?? [];
           return (
-            <Container style={{ backgroundColor: '#f5f5f5', flex: 1, paddingBottom: 0 }}>
+            <Container style={{ backgroundColor: '#f5f5f5', flex: 1, paddingBottom: 0, paddingHorizontal: 0 }}>
               {/* <Header title="My Cart" /> */}
 
               {/* Voucher Bar */}
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     justifyContent: 'space-between', 
     paddingHorizontal: 16,
-    paddingVertical: 8, 
+    paddingVertical: 16, 
     borderTopWidth: 1, 
     borderColor: '#eee', 
     backgroundColor: '#fff', 
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   buyText: { 
     color: init.Color.Whites, 
     fontWeight: 'bold', 
-    fontSize: 14 
+    fontSize: 18 
   },
   buyTextDisabled: {
     color: '#999',

@@ -20,9 +20,10 @@ export function ProfileMenu() {
           };
 
           const handleViewPurchaseHistory = () => navigate({ pathSegments: ["PurchaseHistory"] });
-          const handleTrackOrder = () => navigate({ pathSegments: ["TrackOrder"] });
+          // const handleTrackOrder = () => navigate({ pathSegments: ["TrackOrder"] });
           const handleSupportCenter = () => navigate({ pathSegments: ["SupportCenter"] });
           const handleChat = () => navigate({ pathSegments: ["Chat"] });
+          const handleViewVouchers = () => navigate({ pathSegments: ["Vouchers"] });
           const handleWebPlatform = () => navigate({ pathSegments: ["WebPlatform"] });
 
           return (
@@ -43,13 +44,22 @@ export function ProfileMenu() {
                       <RText style={styles.buttonText}>View purchase history</RText>
                       <Ionicons name="chevron-forward" size={(20)} color="#E0224A" />
                     </TouchableOpacity>
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                       style={styles.button}
-                      onPress={handleTrackOrder}
+                      // onPress={handleTrackOrder}
                       accessibilityLabel="Track order"
                     >
                       <Ionicons name="map-outline" size={(20)} color="#E0224A" />
                       <RText style={styles.buttonText}>Track order</RText>
+                      <Ionicons name="chevron-forward" size={(20)} color="#E0224A" />
+                    </TouchableOpacity> */}
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={handleViewVouchers}
+                      accessibilityLabel="View Vouchers"
+                    >
+                      <Ionicons name="gift" size={(20)} color="#E0224A" />
+                      <RText style={styles.buttonText}>View Vouchers</RText>
                       <Ionicons name="chevron-forward" size={(20)} color="#E0224A" />
                     </TouchableOpacity>
                   </View>
