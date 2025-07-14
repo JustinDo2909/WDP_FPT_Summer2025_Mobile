@@ -8,6 +8,8 @@ import { Alert, Linking } from "react-native";
 import Toast from "react-native-toast-message"; // Assuming Toast is used
 import Constants from "expo-constants";
 import * as WebBrowser from "expo-web-browser";
+import { useCustomRouter } from "@/src/libs/hooks/useCustomRouter";
+import { formatPrice } from "@/src/libs/share/formatPrice";
 
 const { GHN_API_TOKEN, GHN_CLIENT_ID, GHN_SHOP_ID } =
   Constants.expoConfig?.extra ?? {};
@@ -40,6 +42,8 @@ export default GenCtx({
         fields: {},
       },
     });
+
+    const { navigate } = useCustomRouter();
 
     const ss = sStore();
     const [selectedAddress, setSelectedAddress] = useState<IAddress | null>(
@@ -85,14 +89,24 @@ export default GenCtx({
     const discount = useMemo(() => {
       if (!selectedVoucher) return 0;
 
-      const { type, discount_value } = selectedVoucher;
+      const voucherProductIds = selectedVoucher.voucherProducts?.map(
+          (vp) => vp.product.id
+        );
+        const matchingCartItems = cartItems.filter((item) =>
+          voucherProductIds?.includes(item.product_id)
+        );
 
-      if (type === "PERCENT") {
-        return (subtotal * discount_value) / 100;
-      } else if (type === "AMOUNT") {
-        return discount_value;
-      }
-      return 0;
+        const totalPrice = matchingCartItems.reduce((sum, item) => {
+          const price = item.product.sale_price ?? item.product.price;
+          const quantity = item.quantity || 1;
+          return sum + price * quantity;
+        }, 0);
+
+        if (selectedVoucher.type === "PERCENT") {
+          return Math.round(totalPrice * (selectedVoucher.discount_value / 100));
+        } else {
+          return selectedVoucher.discount_value;
+        }
     }, [selectedVoucher, subtotal]);
 
     const total = useMemo(() => {
@@ -253,14 +267,10 @@ export default GenCtx({
         }
       },
 
-      async onGetShippingFee(
-        to_district_id: number,
-        to_ward_code: string
-      ): Promise<number | null> {
+      async onGetShippingFee(to_district_id: number, to_ward_code: string) {
         try {
           const payload = {
-            service_id: 53320,
-            service_type_id: null,
+            service_type_id: 2,
             to_district_id: Number(to_district_id),
             to_ward_code: to_ward_code,
             weight: 100,
@@ -283,8 +293,7 @@ export default GenCtx({
             },
           });
 
-          setShippingFee(data.data.total)
-        } catch (error) {
+          setShippingFee(Math.round(data.data.total / 1000) * 1000);        } catch (error) {
           onError({ error });
           Toast.show({
             type: "error",
@@ -335,19 +344,25 @@ export default GenCtx({
               addressId: selectedAddress.id,
               couponId: selectedVoucher?.stripe_coupon_id,
               shippingCost: shippingFee,
-              // isMobile: true,
+              isMobile: true,
             },
           });
+
           if (data?.url) {
-            WebBrowser.openBrowserAsync(data.url)
-              .then(() => {
-                Alert.alert(
-                  "Chuyển hướng thanh toán",
-                  "Bạn đang được chuyển đến trang thanh toán Stripe."
-                );
-                // Clear cart after successful order
-                // Navigate to success page (replace with your navigation logic)
-                // Example: navigation.navigate('CheckoutSuccess');
+            const redirectUrl = "wdpmobile://";
+            WebBrowser.openAuthSessionAsync(data.url, redirectUrl)
+              .then((result) => {
+                console.log(result);
+                if (result.type === "success" && result.url) {
+                  // Browser dismissed, now handle the deep link
+                  Linking.openURL(result.url);
+                } else if (result.type === "cancel") {
+                  Toast.show({
+                    type: "info",
+                    text1: "Đã hủy",
+                    text2: "Bạn đã hủy thanh toán.",
+                  });
+                }
               })
               .catch(() => {
                 Toast.show({
@@ -355,8 +370,6 @@ export default GenCtx({
                   text1: "Lỗi chuyển hướng",
                   text2: "Không thể mở trang thanh toán.",
                 });
-                // Navigate to error page (replace with your navigation logic)
-                // Example: navigation.navigate('CheckoutError');
               });
           }
         } catch (error) {
@@ -366,7 +379,6 @@ export default GenCtx({
             text1: "Lỗi đặt hàng",
             text2: "Đã xảy ra lỗi khi đặt đơn hàng.",
           });
-          // Optionally navigate to error page
         } finally {
           setIsLoading(false);
         }
@@ -382,6 +394,36 @@ export default GenCtx({
           /^(?:\+84|0)(3[2-9]|5[2689]|7[06-9]|8[1-689]|9[0-46-9])[0-9]{7}$/;
 
         return regex.test(cleaned);
+      },
+
+      calculateVoucherSavings(
+        voucher: IVoucher,
+        cartItems: ICartLineItem[]
+      ): number {
+        const voucherProductIds = voucher.voucherProducts?.map(
+          (vp) => vp.product.id
+        );
+        const matchingCartItems = cartItems.filter((item) =>
+          voucherProductIds?.includes(item.product_id)
+        );
+
+        const totalPrice = matchingCartItems.reduce((sum, item) => {
+          const price = item.product.sale_price ?? item.product.price;
+          const quantity = item.quantity || 1;
+          return sum + price * quantity;
+        }, 0);
+
+        if (voucher.type === "PERCENT") {
+          return Math.round(totalPrice * (voucher.discount_value / 100));
+        } else {
+          return voucher.discount_value;
+        }
+      },
+
+      formatDiscount(voucher: IVoucher) {
+        return voucher.type === "PERCENT"
+          ? `${voucher.discount_value}% OFF`
+          : `${formatPrice(voucher.discount_value)} OFF`;
       },
 
       //#region UI State Management
@@ -408,7 +450,10 @@ export default GenCtx({
     // Shipping fee logic
     useEffect(() => {
       if (selectedAddress) {
-        meds.onGetShippingFee(Number(selectedAddress.to_district_id), String(selectedAddress.to_ward_code))
+        meds.onGetShippingFee(
+          Number(selectedAddress.to_district_id),
+          String(selectedAddress.to_ward_code)
+        );
       } else {
         setShippingFee(null);
       }

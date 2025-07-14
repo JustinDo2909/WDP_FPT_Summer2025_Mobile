@@ -4,6 +4,7 @@ export type State = {
   Pick: {
     NavHeading?: string;
     Svg?: Record<string, string>;
+    ActiveTab?: string;
   };
   setPickData(Obj: State["Pick"]): void;
   resetPick(): void;

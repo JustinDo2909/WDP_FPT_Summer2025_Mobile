@@ -10,6 +10,9 @@ import { useCustomRouter } from "@/src/libs/hooks/useCustomRouter";
 import { useState, useRef } from "react";
 import { onCRUD } from "@/src/process/api/regular";
 
+const list = ["SignIn", "Cart", "Checkout", "History Purchase", "Vouchers", "PurchaseHistory"];
+
+
 export function Header() {
   const ss = sStore();
   const { navigate } = useCustomRouter();
@@ -96,7 +99,7 @@ export function Header() {
       >
         <RenderTitle />
 
-        {(ss.Pick?.NavHeading !== "Shopping Cart" && ss.Pick?.NavHeading !== "Checkout" && ss.Pick?.NavHeading !== "History Purchase" && ss.Pick.NavHeading !== "Vouchers")  && (
+        {(ss.Pick?.NavHeading !== "Shopping Cart" && ss.Pick?.NavHeading !== "Checkout" && ss.Pick?.NavHeading !== "Cart" && ss.Pick?.NavHeading !== "History Purchase" && ss.Pick.NavHeading !== "Vouchers")  && (
           <>
             <View
               style={{
@@ -129,6 +132,7 @@ export function Header() {
               <TouchableOpacity
                 onPress={() => {
                   ss.setPickData({ NavHeading: "Shopping Cart" });
+                  ss.setPickData({ ActiveTab: ""  });
                   navigate({ pathSegments: ["Cart"] });
                 }}
                 style={{ padding: 8 }}
@@ -218,7 +222,6 @@ const RenderTitle = () => {
   const ss = sStore();
   const params = useGlobalSearchParams<any>();
   const gFnID = last(split(String(params?.path), "/"));
-  const list = ["Home", "SignIn", "Shopping Cart"];
   const fnc = find(list, (ele) => isEqual(ele, gFnID));
 
   const BtnBack = (
@@ -227,7 +230,14 @@ const RenderTitle = () => {
         if (router.canGoBack()) {
           router.back();
         }
-        ss.setPickData({ NavHeading: "" });
+        switch (fnc) {
+          case "Checkout":
+            ss.setPickData({ NavHeading: "Shopping Cart" });
+            break;
+          default:
+            ss.setPickData({ NavHeading: "" });
+            break;
+        }
       }}
       style={{ padding: 4 }}
     >
@@ -239,11 +249,11 @@ const RenderTitle = () => {
     </TouchableOpacity>
   );
 
-  if (ss.Pick?.NavHeading) {
+  if (ss.Pick?.NavHeading || fnc) {
     return (
       <Wrap style={{ gap: 16, alignItems: "center" }}>
         {BtnBack}
-        {ss.Pick?.NavHeading !== "Back" && (
+        {(ss.Pick?.NavHeading !== "Back" && fnc) && (
           <RText
             style={{
               fontWeight: 600,
@@ -252,14 +262,13 @@ const RenderTitle = () => {
               paddingVertical: 14,
             }}
           >
-            {ss.Pick?.NavHeading || fnc}
+            {splitCamelCase(ss.Pick?.NavHeading || fnc)}
           </RText>
         )}
       </Wrap>
     );
   }
-
-  // return (
-  //   <RText>Logo</RText>
-  // );
 };
+
+const splitCamelCase = (str: string) =>
+  str ? str.replace(/([a-z])([A-Z])/g, '$1 $2') : '';
