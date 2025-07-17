@@ -1,14 +1,15 @@
-import { Home, SignIn } from "@/src/pattern/screen";
+import { SignIn, Register } from "@/src/pattern/screen";
 import { sStore } from "@/src/stores";
-import { Redirect } from "expo-router";
+import { Redirect, useLocalSearchParams } from "expo-router";
 import React from "react";
 
-export default function Screen() {
+export default function AuthScreen() {
   const { Auth } = sStore();
+  const { type } = useLocalSearchParams<{ type: string }>();
 
   if (Auth?.Token) {
-    return <Redirect href={"/root" as any}  />;
+    return <Redirect href="/root" />;
   }
 
-  return <SignIn />;
+  return type === "register" ? <Register /> : <SignIn />;
 }

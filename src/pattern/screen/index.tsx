@@ -12,3 +12,4 @@ export * from "./SignIn";
 export * from "./Success";
 export * from "./Failure"
 export * from "./Vouchers"
+export * from "./Register"
