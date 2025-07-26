@@ -1,10 +1,9 @@
 import { onCRUD, onError } from "@/src/process/api/regular";
 import { GenCtx } from "@/src/process/hooks";
 import { sStore } from "@/src/stores";
-import { AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import Toast from "react-native-toast-message";
 
 export default GenCtx({
   useLogic() {
@@ -69,11 +68,17 @@ export default GenCtx({
           }).Post({
             payload: {},
           });
-          Toast.show({
-            type: "success",
-          });
+          setHasStarted(true); // Set hasStarted on success
         } catch (error) {
-          onError({ error });
+          const axiosError = error as AxiosError;
+          if (axiosError.response?.status === 400) {
+            throw new Error(
+              "You have already played today. Try again tomorrow!"
+            );
+          } else {
+            onError({ error });
+            throw error; // Propagate non-400 errors
+          }
         }
       },
 
@@ -92,21 +97,21 @@ export default GenCtx({
         }
       },
       // #endregion
-      //#endregion
-      handlePlayGame() {
-        setHasStarted(true);
-        meds.playGame();
+      async handlePlayGame() {
+        try {
+          await meds.playGame(); // hasStarted is set in playGame
+        } catch (error) {
+          throw error; // Propagate error for Alert in MenuGlowKnow
+        }
       },
     };
 
     //#region LifeCycle
-
     useEffect(() => {
       ss.resetPick();
       meds.onGetQuestions();
       meds.onGetEventReward();
     }, []);
-
     //#endregion
 
     return { meds, methods, ss, hasStarted };

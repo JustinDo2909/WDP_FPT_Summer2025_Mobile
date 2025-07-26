@@ -8,51 +8,73 @@ import {
   Section,
   Wrap,
 } from "@/src/libs/by";
-import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React from "react";
-import { Image, ScrollView, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  Image,
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import Context from "./seg/context";
 
 export function Event() {
-  const router = useRouter();
-
-  // Hàm chọn màu nền dựa trên image_url hoặc index
-  const getBackgroundColor = (
-    imageUrl: string | undefined,
-    index: number
-  ): string => {
-    if (!imageUrl) {
-      const defaultColors = ["#ef4444", "#000000", "#3b82f6"];
-      return defaultColors[index % defaultColors.length];
-    }
-    if (imageUrl.includes("red")) return "#ef4444";
-    if (imageUrl.includes("black")) return "#000000";
-    if (imageUrl.includes("blue")) return "#3b82f6";
-    return "#6b7280"; // Màu xám mặc định
-  };
-
-  const handleGamePress = (event: IEvent) => {
-    if (!event.is_active) {
-      router.push(`/root/dynamic?path=/ComingSoon`);
-      return;
-    }
-    const routeMap: { [key: string]: string } = {
-      DROP: "BeautyDrop",
-      QUIZ: "GlowKnowQuiz",
-    };
-    const route = routeMap[event.type || ""] || "ComingSoon";
-    router.push(`/root/dynamic?path=/${route}`);
-  };
+  const [isLoading, setIsLoading] = useState(true);
 
   return (
     <Context.Provider>
       <Context.Consumer>
         {({ ss }) => {
-          const events = ss.Joint?.Events ?? [];
+          const router = useRouter();
+
+          useEffect(() => {
+            if (ss.Joint.Events && ss.Joint.Events.length >= 0) {
+              setIsLoading(false);
+            }
+          }, [ss.Joint.Events]);
+
+          // Define gradient colors for fallback
+          const gradients: [string, string][] = [
+            ["#ef4444", "#7f1d1d"], // red-500 to red-950
+            ["#000000", "#737373"], // black to neutral-400
+            ["#3b82f6", "#c4b5fd"], // blue-500 to violet-300
+            ["#10b981", "#064e3b"], // emerald-500 to emerald-950
+            ["#f59e0b", "#78350f"], // amber-500 to amber-950
+            ["#8b5cf6", "#4c1d95"], // violet-500 to violet-950
+          ];
+
+          const handleEventPress = (event: IEvent) => {
+            if (!event.is_active || event.type === "DROP") {
+              router.push(`/root/dynamic?path=/ComingSoon`);
+            } else {
+              let route = "Event";
+              if (event.type === "QUIZ") {
+                route = "GlowKnowQuiz";
+              } else if (event.type) {
+                route = `${event.type.replace(/\s+/g, "")}Event`;
+              }
+              ss.setPickData({ NavHeading: "Back" });
+              router.push(`/root/dynamic?path=/${route}`);
+            }
+          };
+
+          if (isLoading) {
+            return (
+              <Container style={styles.loadingContainer}>
+                <Image
+                  source={require("../../../../assets/images/logo.png")}
+                  style={styles.loadingImage}
+                  resizeMode="contain"
+                />
+              </Container>
+            );
+          }
 
           return (
             <Container style={styles.container}>
+              {/* Title Section */}
               <Section style={styles.titleSection}>
                 <Row style={styles.titleRow}>
                   <Row style={styles.titleContent}>
@@ -69,73 +91,127 @@ export function Event() {
                     </Wrap>
                     <RText style={styles.subtitle}>Play, Win, Glow!</RText>
                   </Row>
-                  <Row style={styles.actionButtons}>
+
+                  {/* <Row style={styles.actionButtons}>
                     <Button _type="Icon" _set={{ style: styles.actionButton }}>
                       <MaterialIcons name="history" size={24} color="black" />
                     </Button>
                     <Button _type="Icon" _set={{ style: styles.actionButton }}>
                       <FontAwesome5 name="home" size={24} color="black" />
                     </Button>
-                  </Row>
+                  </Row> */}
                 </Row>
               </Section>
+
+              {/* Events List */}
               <ScrollView
                 style={styles.gamesList}
-                showsVerticalScrollIndicator={false}
+                showsVerticalScrollIndicator={true}
               >
                 <Column style={styles.gamesContainer}>
-                  {events.map((event, index) => (
-                    <Button
-                      key={event.id || `event-${index}`}
-                      _type="Icon"
-                      _set={{
-                        style: styles.gameCard,
-                        onPress: () => handleGamePress(event),
-                      }}
-                    >
-                      {() => (
-                        <Block
-                          style={[
-                            styles.gradientBackground,
-                            {
-                              backgroundColor: getBackgroundColor(
-                                event.image_url,
-                                index
-                              ),
-                            },
-                          ]}
+                  {(ss.Joint.Events ?? []).length > 0 ? (
+                    (ss.Joint.Events ?? []).map(
+                      (event: IEvent, index: number) => (
+                        <Button
+                          key={event.id ?? `event-${index}`}
+                          _type="Icon"
+                          _set={{
+                            style: styles.gameCard,
+                            onPress: () => handleEventPress(event),
+                          }}
                         >
-                          <Row style={styles.gameContent}>
-                            <Block style={styles.gameIconContainer}>
-                              {event.image_url ? (
-                                <Image
-                                  source={{ uri: event.image_url }}
-                                  style={styles.gameIconImage}
-                                  resizeMode="cover"
-                                />
-                              ) : null}
-                            </Block>
-                            <Column style={styles.gameInfo}>
-                              <RText style={styles.gameTitle}>
-                                {event.title || "Untitled Event"}
-                              </RText>
-                              <RText style={styles.gameDescription}>
-                                {event.description ||
-                                  "No description available"}
-                              </RText>
-                            </Column>
-                            {!event.is_active && (
-                              <Block style={styles.comingSoonBadge}>
-                                <RText style={styles.comingSoonText}>
-                                  Coming soon...
-                                </RText>
-                              </Block>
-                            )}
-                          </Row>
-                        </Block>
-                      )}
-                    </Button>
-                  ))}
+                          {() =>
+                            event.image_url ? (
+                              <ImageBackground
+                                source={{ uri: event.image_url }}
+                                style={styles.gradientBackground}
+                                imageStyle={styles.backgroundImage}
+                              >
+                                <View style={styles.overlay}>
+                                  <Row style={styles.gameContent}>
+                                    {/* Event Icon */}
+                                    <Block style={styles.gameIconContainer}>
+                                      {event.image_url ? (
+                                        <Image
+                                          source={{ uri: event.image_url }}
+                                          style={styles.gameIconImage}
+                                          resizeMode="cover"
+                                        />
+                                      ) : null}
+                                    </Block>
+
+                                    {/* Event Info */}
+                                    <Column style={styles.gameInfo}>
+                                      <RText style={styles.gameTitle}>
+                                        {event.title ?? "Unnamed Event"}
+                                      </RText>
+                                      <RText style={styles.gameDescription}>
+                                        {event.description ??
+                                          "No description available"}
+                                      </RText>
+                                    </Column>
+
+                                    {/* Coming Soon Badge */}
+                                    {!event.is_active && (
+                                      <Block style={styles.comingSoonBadge}>
+                                        <RText style={styles.comingSoonText}>
+                                          Coming soon...
+                                        </RText>
+                                      </Block>
+                                    )}
+                                  </Row>
+                                </View>
+                              </ImageBackground>
+                            ) : (
+                              <LinearGradient
+                                colors={gradients[index % gradients.length]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 1 }}
+                                style={styles.gradientBackground}
+                              >
+                                <Row style={styles.gameContent}>
+                                  {/* Event Icon */}
+                                  <Block style={styles.gameIconContainer}>
+                                    {event.image_url ? (
+                                      <Image
+                                        source={{ uri: event.image_url }}
+                                        style={styles.gameIconImage}
+                                        resizeMode="cover"
+                                      />
+                                    ) : null}
+                                  </Block>
+
+                                  {/* Event Info */}
+                                  <Column style={styles.gameInfo}>
+                                    <RText style={styles.gameTitle}>
+                                      {event.title ?? "Unnamed Event"}
+                                    </RText>
+                                    <RText style={styles.gameDescription}>
+                                      {event.description ??
+                                        "No description available"}
+                                    </RText>
+                                  </Column>
+
+                                  {/* Coming Soon Badge */}
+                                  {!event.is_active && (
+                                    <Block style={styles.comingSoonBadge}>
+                                      <RText style={styles.comingSoonText}>
+                                        Coming soon...
+                                      </RText>
+                                    </Block>
+                                  )}
+                                </Row>
+                              </LinearGradient>
+                            )
+                          }
+                        </Button>
+                      )
+                    )
+                  ) : (
+                    <RText style={styles.noEventsText}>
+                      No events available
+                    </RText>
+                  )}
                 </Column>
               </ScrollView>
             </Container>
@@ -149,6 +225,15 @@ export function Event() {
 const styles = StyleSheet.create({
   container: {
     borderRadius: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingImage: {
+    width: 100,
+    height: 100,
   },
   titleSection: {
     width: "100%",
@@ -209,7 +294,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.12,
     shadowRadius: 6,
-    backgroundColor: "transparent",
+    backgroundColor: "#000",
     minHeight: 80,
   },
   gradientBackground: {
@@ -217,6 +302,15 @@ const styles = StyleSheet.create({
     minHeight: 80,
     width: "100%",
     justifyContent: "center",
+  },
+  backgroundImage: {
+    borderRadius: 10,
+    opacity: 0.6,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.3)", // Dark overlay for text contrast
+    borderRadius: 10,
   },
   gameContent: {
     alignItems: "center",
@@ -240,16 +334,17 @@ const styles = StyleSheet.create({
   gameInfo: {
     flex: 1,
     gap: 10,
+    padding: 10,
   },
   gameTitle: {
     color: "white",
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
   },
   gameDescription: {
     color: "white",
     fontSize: 16,
-    fontWeight: "300",
+    fontWeight: "400",
   },
   comingSoonBadge: {
     position: "absolute",
@@ -265,5 +360,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  noEventsText: {
+    color: "#333",
+    fontSize: 16,
+    textAlign: "center",
+    padding: 20,
   },
 });

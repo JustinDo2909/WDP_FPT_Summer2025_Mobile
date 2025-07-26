@@ -32,9 +32,9 @@ export function RenderResults(props: {
           >
             <RText style={resultStyles.headerButtonText}>Shop</RText>
           </TouchableOpacity>
-          <TouchableOpacity style={resultStyles.headerButton}>
+          {/* <TouchableOpacity style={resultStyles.headerButton}>
             <RText style={resultStyles.headerButtonText}>Redeem</RText>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </Section>
 
         <RText style={resultStyles.congratsTitle}>Congratulation!</RText>

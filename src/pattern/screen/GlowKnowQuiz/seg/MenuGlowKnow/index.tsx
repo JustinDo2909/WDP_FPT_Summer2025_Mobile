@@ -1,6 +1,8 @@
 import { Column, Container, RText, Section } from "@/src/libs/by";
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef } from "react";
 import {
+  Alert,
   Animated,
   Easing,
   ImageBackground,
@@ -9,9 +11,10 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-export function MenuGlowKnow({ onPlay }: { onPlay: () => void }) {
+export function MenuGlowKnow({ onPlay }: { onPlay: () => Promise<void> }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const router = useRouter();
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -29,14 +32,26 @@ export function MenuGlowKnow({ onPlay }: { onPlay: () => void }) {
     }).start();
   };
 
-  const onPressOut = () => {
+  const onPressOut = async () => {
     Animated.spring(scaleAnim, {
       toValue: 1,
       friction: 3,
       tension: 40,
       useNativeDriver: true,
     }).start();
-    onPlay();
+    try {
+      await onPlay(); // Call handlePlayGame, proceeds to GamePlay on success
+    } catch (error: any) {
+      Alert.alert(
+        "Unable to Play",
+        error.message || "An error occurred. Please try again later.",
+        [{ text: "OK" }]
+      );
+    }
+  };
+
+  const handleExit = () => {
+    router.back(); // Navigate back to previous page
   };
 
   return (
@@ -75,7 +90,7 @@ export function MenuGlowKnow({ onPlay }: { onPlay: () => void }) {
               <RText style={styles.playText}>Play Now!</RText>
             </Animated.View>
           </TouchableWithoutFeedback>
-          <TouchableOpacity style={styles.exitButton}>
+          <TouchableOpacity style={styles.exitButton} onPress={handleExit}>
             <RText style={styles.exitText}>Exit</RText>
           </TouchableOpacity>
         </Section>

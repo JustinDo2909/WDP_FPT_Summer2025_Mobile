@@ -1,14 +1,14 @@
-import { Block, Button, Core, Cover, Group, RText, Wrap } from "@/src/libs/by";
+import { Block, RText, Wrap } from "@/src/libs/by";
+import { useCustomRouter } from "@/src/libs/hooks/useCustomRouter";
+import { onCRUD } from "@/src/process/api/regular";
 import { init } from "@/src/process/constants";
 import { sStore } from "@/src/stores";
-import { router, useGlobalSearchParams, useRouter } from "expo-router";
-import { find, isEqual, last, split } from "lodash";
-import { TouchableOpacity, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useCustomRouter } from "@/src/libs/hooks/useCustomRouter";
-import { useState, useRef } from "react";
-import { onCRUD } from "@/src/process/api/regular";
+import { router, useGlobalSearchParams, useRouter } from "expo-router";
+import { find, isEqual, last, split } from "lodash";
+import { useRef, useState } from "react";
+import { TextInput, TouchableOpacity, View } from "react-native";
 
 export function Header() {
   const ss = sStore();
@@ -22,7 +22,7 @@ export function Header() {
   // Import onCRUD for logout
 
   // Dropdown menu component
-  const DropdownMenu = () => (
+  const DropdownMenu = () =>
     menuOpen ? (
       <View
         style={{
@@ -50,10 +50,17 @@ export function Header() {
             }
           }}
         >
-          <Ionicons name="help-circle-outline" size={20} color="#FF4F81" style={{ marginRight: 8 }} />
+          <Ionicons
+            name="help-circle-outline"
+            size={20}
+            color="#FF4F81"
+            style={{ marginRight: 8 }}
+          />
           <RText style={{ color: "#FF4F81", fontSize: 16 }}>Help?</RText>
         </TouchableOpacity>
-        <View style={{ height: 1, backgroundColor: "#eee", marginHorizontal: 8 }} />
+        <View
+          style={{ height: 1, backgroundColor: "#eee", marginHorizontal: 8 }}
+        />
         <TouchableOpacity
           style={{ padding: 14, flexDirection: "row", alignItems: "center" }}
           onPress={async () => {
@@ -63,12 +70,16 @@ export function Header() {
             router.push("/auth");
           }}
         >
-          <Ionicons name="key-outline" size={20} color="#FF4F81" style={{ marginRight: 8 }} />
+          <Ionicons
+            name="key-outline"
+            size={20}
+            color="#FF4F81"
+            style={{ marginRight: 8 }}
+          />
           <RText style={{ color: "#FF4F81", fontSize: 16 }}>Log out</RText>
         </TouchableOpacity>
       </View>
-    ) : null
-  );
+    ) : null;
 
   return (
     <LinearGradient
@@ -96,74 +107,77 @@ export function Header() {
       >
         <RenderTitle />
 
-        {(ss.Pick?.NavHeading !== "Shopping Cart" && ss.Pick?.NavHeading !== "Checkout" && ss.Pick?.NavHeading !== "History Purchase" && ss.Pick.NavHeading !== "Vouchers")  && (
-          <>
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: "white",
-                borderRadius: 20,
-                flexDirection: "row",
-                alignItems: "center",
-                paddingHorizontal: 16,
-                paddingVertical: 2,
-              }}
-            >
-              <Ionicons
-                name="search"
-                size={20}
-                color="#999"
-                style={{ marginRight: 8 }}
-              />
-              <TextInput
-                placeholder="Search your product"
+        {ss.Pick?.NavHeading !== "Shopping Cart" &&
+          ss.Pick?.NavHeading !== "Checkout" &&
+          ss.Pick?.NavHeading !== "History Purchase" &&
+          ss.Pick.NavHeading !== "Vouchers" && (
+            <>
+              <View
                 style={{
                   flex: 1,
-                  fontSize: 12,
-                  color: "#333",
+                  backgroundColor: "white",
+                  borderRadius: 20,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: 16,
+                  paddingVertical: 2,
                 }}
-                placeholderTextColor="#999"
-              />
-            </View>
-            {isLoggedIn && (
-              <TouchableOpacity
-                onPress={() => {
-                  ss.setPickData({ NavHeading: "Shopping Cart" });
-                  navigate({ pathSegments: ["Cart"] });
-                }}
-                style={{ padding: 8 }}
               >
-                <Ionicons name="bag-outline" size={24} color="white" />
-                {cartQuantity > 0 && (
-                  <View
-                    style={{
-                      position: "absolute",
-                      top: 2,
-                      right: 2,
-                      backgroundColor: "#fff",
-                      borderRadius: 8,
-                      minWidth: 16,
-                      height: 16,
-                      justifyContent: "center",
-                      alignItems: "center",
-                      paddingHorizontal: 4,
-                    }}
-                  >
-                    <RText
+                <Ionicons
+                  name="search"
+                  size={20}
+                  color="#999"
+                  style={{ marginRight: 8 }}
+                />
+                <TextInput
+                  placeholder="Search your product"
+                  style={{
+                    flex: 1,
+                    fontSize: 12,
+                    color: "#333",
+                  }}
+                  placeholderTextColor="#999"
+                />
+              </View>
+              {isLoggedIn && (
+                <TouchableOpacity
+                  onPress={() => {
+                    ss.setPickData({ NavHeading: "Shopping Cart" });
+                    navigate({ pathSegments: ["Cart"] });
+                  }}
+                  style={{ padding: 8 }}
+                >
+                  <Ionicons name="bag-outline" size={24} color="white" />
+                  {cartQuantity > 0 && (
+                    <View
                       style={{
-                        color: "#FF4F81",
-                        fontSize: 16,
-                        fontWeight: "bold",
+                        position: "absolute",
+                        top: 2,
+                        right: 2,
+                        backgroundColor: "#fff",
+                        borderRadius: 8,
+                        minWidth: 16,
+                        height: 16,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        paddingHorizontal: 4,
                       }}
                     >
-                      {cartQuantity}
-                    </RText>
-                  </View>
-                )}
-              </TouchableOpacity>
-            )}
-          </>
-        )}
+                      <RText
+                        style={{
+                          color: "#FF4F81",
+                          fontSize: 16,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {cartQuantity}
+                      </RText>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              )}
+            </>
+          )}
 
         {isLoggedIn ? (
           <>
@@ -183,6 +197,7 @@ export function Header() {
                         height: 4,
                         borderRadius: 2,
                         backgroundColor: "white",
+                        zIndex: 99,
                       }}
                     />
                   ))}
