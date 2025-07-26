@@ -65,6 +65,10 @@ function onCRUD({
       return await instance?.post(url, payload, config);
     },
 
+    async Put({ payload, config }: Args) {
+      return await instance?.put(url, payload, config);
+    },
+
     async Delete({ payload, config }: Args) {
       return await instance?.delete(url, {
         params: {

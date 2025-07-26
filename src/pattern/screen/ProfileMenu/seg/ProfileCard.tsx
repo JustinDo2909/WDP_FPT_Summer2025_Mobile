@@ -1,22 +1,18 @@
-import { Card, Column, Row, RText } from "@/src/libs/by";
+import { Begin, Card, Column, Row, RText } from "@/src/libs/by";
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View } from "react-native";
 
-export function ProfileCard({ name, phone, points }: { name: string; phone: string; points: number }) {
+export function ProfileCard({ name, phone }: { name: string; phone: string; }) {
   return (
     <Card style={styles.card}>
       <Row style={{ alignItems: 'center', gap: 12 }}>
-        <View style={styles.avatar}><RText style={styles.avatarText}>{name[0]}</RText></View>
+        <Begin style={styles.avatar}><RText style={styles.avatarText}>{name[0]}</RText></Begin>
         <Column style={{ flex: 1 }}>
           <RText style={styles.name}>{name}</RText>
           <RText style={styles.phone}>{phone}</RText>
         </Column>
         <Ionicons name="bag-outline" size={28} color="#F23059" />
       </Row>
-      <View style={styles.pointsBox}>
-        <RText style={styles.pointsLabel}>Game Point:</RText>
-        <RText style={styles.points}>{points} points</RText>
-      </View>
     </Card>
   );
 }

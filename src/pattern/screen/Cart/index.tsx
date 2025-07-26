@@ -1,8 +1,8 @@
 import { Button, Container, Row, RText } from "@/src/libs/by";
-import { Ionicons } from '@expo/vector-icons';
-import { map } from "lodash";
+import { formatPrice } from "@/src/libs/share/formatPrice";
+import { init } from "@/src/process/constants";
 import React from "react";
-import { ScrollView, StyleSheet, View, Alert } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { CartItem } from "./seg/CartItem";
 import Context from "./seg/context";
 
@@ -10,102 +10,14 @@ export function Cart() {
   return (
     <Context.Provider>
       <Context.Consumer>
-        {({ ss }) => {
-          const cart = ss.Joint.Cart as ICart | undefined;
-          const [selected, setSelected] = React.useState<number[]>([]);
-          const [isLoading, setIsLoading] = React.useState(false);
-
-          // Handle individual item selection
-          const handleSelect = (id: number) => {
-            setSelected((prev) => 
-              prev.includes(id) 
-                ? prev.filter(i => i !== id) 
-                : [...prev, id]
-            );
-          };
-
-          // Handle select all functionality
-          const handleSelectAll = () => {
-            const allItemIds = cart?.cartItems?.map(item => item.id) ?? [];
-            const allSelected = selected.length === allItemIds.length && allItemIds.length > 0;
-            setSelected(allSelected ? [] : allItemIds);
-          };
-
-          // Calculate total cost of selected items
-          const calculateTotal = () => {
-            if (!cart?.cartItems) return 0;
-            return cart.cartItems
-              .filter(item => selected.includes(item.id))
-              .reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-          };
-
-          // Format currency
-          const formatCurrency = (amount: number) => {
-            return new Intl.NumberFormat('vi-VN', {
-              style: 'currency',
-              currency: 'VND'
-            }).format(amount);
-          };
-
-          // Handle voucher selection
-          const handleVoucherPress = () => {
-            // Navigate to voucher selection screen or show modal
-            Alert.alert("Vouchers", "Voucher selection feature coming soon!");
-          };
-
-          // Handle buy action
-          const handleBuyPress = async () => {
-            if (selected.length === 0) {
-              Alert.alert("No items selected", "Please select items to purchase.");
-              return;
-            }
-
-            setIsLoading(true);
-            try {
-              // Simulate API call
-              await new Promise(resolve => setTimeout(resolve, 1000));
-              Alert.alert("Success", "Items purchased successfully!");
-              setSelected([]); // Clear selection after successful purchase
-            } catch (error) {
-              Alert.alert("Error", "Failed to process purchase. Please try again.");
-            } finally {
-              setIsLoading(false);
-            }
-          };
-
-          const totalCost = calculateTotal();
-          const allItemIds = cart?.cartItems?.map(item => item.id) ?? [];
-          const isAllSelected = selected.length === allItemIds.length && allItemIds.length > 0;
-          const hasSelectedItems = selected.length > 0;
-
-          // Empty cart state
-          if (!cart?.cartItems || cart.cartItems.length === 0) {
-            return (
-              <Container style={styles.container}>
-                <View style={styles.emptyState}>
-                  <Ionicons name="cart-outline" size={64} color="#ccc" />
-                  <RText style={styles.emptyText}>Your cart is empty</RText>
-                  <RText style={styles.emptySubtext}>Add some items to get started</RText>
-                </View>
-              </Container>
-            );
-          }
-
+        {({ ss, cart, meds, isLoading }) => {
+          const cartItems = cart?.cartItems ?? [];
           return (
-            <Container style={styles.container}>
-              <ScrollView style={styles.scrollView}>
-                {map(cart.cartItems, (item) => (
-                  <CartItem 
-                    key={item.id} 
-                    item={item} 
-                    selected={selected.includes(item.id)} 
-                    onSelect={handleSelect} 
-                  />
-                ))}
-              </ScrollView>
+            <Container style={{ backgroundColor: '#f5f5f5', flex: 1, paddingBottom: 0, paddingHorizontal: 0 }}>
+              {/* <Header title="My Cart" /> */}
 
               {/* Voucher Bar */}
-              <View style={styles.voucherBar}>
+              {/* <View style={styles.voucherBar}>
                 <Row style={styles.voucherRow}>
                   <Row style={styles.voucherLeft}>
                     <Ionicons name="pricetag-outline" size={22} color="#222" />
@@ -113,7 +25,7 @@ export function Cart() {
                   </Row>
                   <Button 
                     _set={{ 
-                      onPress: handleVoucherPress, 
+                      onPress: meds.handleVoucherPress, 
                       style: styles.voucherButton 
                     }} 
                     _type="Default"
@@ -122,51 +34,45 @@ export function Cart() {
                     <Ionicons name="chevron-forward" size={18} color="#888" />
                   </Button>
                 </Row>
-              </View>
+              </View> */}
+
+              <ScrollView style={{ flex: 1 }}>
+                {cartItems.map((item) => (
+                  <CartItem
+                    key={item.id}
+                    item={item}
+                    onQuantityChange={meds.handleQuantityChange}
+                    onRemove={meds.handleRemove}
+                  />
+                ))}
+              </ScrollView>
 
               {/* Select All, Cost, Buy Bar */}
               <View style={styles.bottomBar}>
                 <Row style={styles.bottomRow}>
-                  <Row style={styles.selectAllSection}>
-                    <Button 
-                      _set={{ 
-                        onPress: handleSelectAll, 
-                        style: styles.selectAllBtn 
-                      }} 
-                      _type="Icon"
-                    >
-                      <Ionicons 
-                        name={isAllSelected ? "checkbox" : "square-outline"} 
-                        size={26} 
-                        color="#222" 
-                      />
-                    </Button>
-                    <RText style={styles.selectAllText}>Select all</RText>
-                  </Row>
-                  
                   <View style={styles.costSection}>
                     <RText style={styles.costLabel}>Total:</RText>
                     <RText style={styles.costText}>
-                      {formatCurrency(totalCost)}
+                      {formatPrice(meds.calculateTotal())}
                     </RText>
                   </View>
                   
                   <Button 
                     _set={{ 
-                      onPress: handleBuyPress, 
+                      onPress: meds.handleBuyPress, 
                       style: [
                         styles.buyBtn, 
-                        !hasSelectedItems && styles.buyBtnDisabled
+                        !cartItems.length && styles.buyBtnDisabled
                       ],
-                      disabled: !hasSelectedItems || isLoading
+                      disabled: !cartItems.length || isLoading
                     }} 
                     _type="Fill"
                   >
-                    <RText style={[
-                      styles.buyText,
-                      !hasSelectedItems && styles.buyTextDisabled
-                    ]}>
-                      {isLoading ? "Processing..." : "Buy"}
+                    <RText style={
+                     
+                         styles.buyText
+                    }>
+                      {isLoading ? "Processing..." : "Checkout"}
                     </RText>
                   </Button>
                 </Row>
@@ -181,7 +87,7 @@ export function Cart() {
 
 const styles = StyleSheet.create({
   container: { 
-    backgroundColor: '#fff', 
+    backgroundColor: '#f5f5f5', 
     flex: 1, 
     padding: 0 
   },
@@ -222,8 +128,8 @@ const styles = StyleSheet.create({
     flex: 1 
   },
   voucherLeft: { 
-    alignItems: 'center', 
-    gap: 8 
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   voucherLabel: { 
     color: '#222', 
@@ -245,7 +151,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row', 
     alignItems: 'center', 
     justifyContent: 'space-between', 
-    padding: 16, 
+    paddingHorizontal: 16,
+    paddingVertical: 16, 
     borderTopWidth: 1, 
     borderColor: '#eee', 
     backgroundColor: '#fff', 
@@ -258,11 +165,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between' 
   },
   selectAllSection: { 
-    alignItems: 'center', 
-    gap: 8 
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   selectAllBtn: { 
-    padding: 0 
+    padding: 0,
   },
   selectAllText: { 
     fontWeight: 'bold', 
@@ -283,18 +190,19 @@ const styles = StyleSheet.create({
     color: '#222' 
   },
   buyBtn: { 
-    backgroundColor: '#F9CACA', 
+    backgroundColor: init.Color.PrimaryBrand, 
     borderRadius: 8, 
-    paddingVertical: 12, 
+    paddingVertical: 8, 
     paddingHorizontal: 24,
     minWidth: 80,
+    height: 40,
     alignItems: 'center',
-  },
+  }, 
   buyBtnDisabled: {
     backgroundColor: '#ddd',
   },
   buyText: { 
-    color: '#222', 
+    color: init.Color.Whites, 
     fontWeight: 'bold', 
     fontSize: 18 
   },

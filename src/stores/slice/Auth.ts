@@ -2,8 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StateCreator } from "zustand";
 
 export type State = {
-  Auth: {
-    // UserInfo?: Partial<IUser>;
+    Auth: {
+    User?: Partial<IUser>;
     Token?: string;
  
   };

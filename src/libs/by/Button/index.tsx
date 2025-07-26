@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 16,
     height: Px.H(36),
-    maxHeight: Px.H(36),
+    maxHeight: Px.H(54),
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",

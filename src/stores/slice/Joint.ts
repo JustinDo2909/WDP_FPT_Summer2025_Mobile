@@ -6,6 +6,8 @@ export type State = {
     Products?: IProduct[];
     Cart?: ICart;
     User?: IUser;
+    cartSpin?: boolean;
+    CheckoutCartItems?: ICartLineItem[];
     QuizQuestions?: QuizQuestion[];
     EventReward?: EventReward[];
     Events?: IEvent[];

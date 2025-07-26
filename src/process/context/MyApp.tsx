@@ -5,6 +5,8 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { GenCtx } from "../hooks";
 import { eventBus } from "../utils";
+import { useCustomRouter } from "@/src/libs/hooks/useCustomRouter";
+import Toast from "react-native-toast-message";
 export const MyApp = GenCtx({
   useLogic() {
     const ss = sStore();
@@ -22,8 +24,12 @@ export const MyApp = GenCtx({
     useEffect(() => {
       const listener = () => {
         ss.resetAuth();
-        router.push("/(auth)" as any);
-      };
+        Toast.show({
+          type: "error",
+          text1: "Session expired",
+          text2: "Please log in again.",
+        });
+        router.push("/auth")      };
       eventBus.on("logout", listener);
 
       return () => {
