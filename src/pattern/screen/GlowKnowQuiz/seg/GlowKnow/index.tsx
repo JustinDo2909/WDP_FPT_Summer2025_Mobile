@@ -3,7 +3,7 @@
 import { Column, Container, RText, Section } from "@/src/libs/by";
 import React, { useRef, useState } from "react";
 import { Animated, StyleSheet } from "react-native";
-import { RenderQuiz } from "../RenderQuiz.tsx";
+import { RenderQuiz } from "../RenderQuiz";
 import { RenderResults } from "../RenderResults";
 import context from "../context";
 

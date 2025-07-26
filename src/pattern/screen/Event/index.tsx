@@ -8,149 +8,141 @@ import {
   Section,
   Wrap,
 } from "@/src/libs/by";
-import { sStore } from "@/src/stores";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Image, ScrollView, StyleSheet } from "react-native";
-interface GameEvent {
-  id: string;
-  title: string;
-  description: string;
-  gradient: [string, string];
-  isComingSoon?: boolean;
-  icon?: string;
-  route?: string;
-}
+import Context from "./seg/context";
 
 export function Event() {
   const router = useRouter();
-  const ss = sStore();
-  const gameEvents: GameEvent[] = [
-    {
-      id: "1",
-      title: "Glow & Know?",
-      description: "Test your beauty IQ and unlock exclusive rewards!",
-      gradient: ["#ef4444", "#7f1d1d"], // red-500 to red-950
-      icon: "https://hzjfxfzm26.ufs.sh/f/KMp0egfMgYyWgRpE1y0PbRCkXY9LnGeq3s0xvu1DfoHdiypw",
-      route: "GlowKnowQuiz",
-    },
-    {
-      id: "2",
-      title: "Skincare Stack",
-      description: "Build Your Routine, Reap Your Rewards!",
-      gradient: ["#000000", "#737373"], // black to neutral-400
-      isComingSoon: true,
-      icon: "https://hzjfxfzm26.ufs.sh/f/KMp0egfMgYyWJO2IWBb8oq4Kbj9AfXElYCFHPx6VGdDynW1t",
-      route: "SkinCareStack",
-    },
-    {
-      id: "3",
-      title: "Product Pursuit",
-      description: "Find the Hidden Gems, Win Big!",
-      gradient: ["#3b82f6", "#c4b5fd"], // blue-500 to violet-300
-      isComingSoon: true,
-      icon: "https://hzjfxfzm26.ufs.sh/f/KMp0egfMgYyWs3ZLKz5puPxTBasbNvKnjZzRAoIOXMS7cLdU",
-      route: "ProductPursuit",
-    },
-  ];
 
-  const handleGamePress = (game: GameEvent) => {
-    if (!game.isComingSoon) {
-      ss.setPickData({ NavHeading: "Back" });
-      router.push(`/root/dynamic?path=/${game.route}`);
-    } else {
-      router.push(`/root/dynamic?path=/ComingSoon`);
+  // Hàm chọn màu nền dựa trên image_url hoặc index
+  const getBackgroundColor = (
+    imageUrl: string | undefined,
+    index: number
+  ): string => {
+    if (!imageUrl) {
+      const defaultColors = ["#ef4444", "#000000", "#3b82f6"];
+      return defaultColors[index % defaultColors.length];
     }
+    if (imageUrl.includes("red")) return "#ef4444";
+    if (imageUrl.includes("black")) return "#000000";
+    if (imageUrl.includes("blue")) return "#3b82f6";
+    return "#6b7280"; // Màu xám mặc định
+  };
+
+  const handleGamePress = (event: IEvent) => {
+    if (!event.is_active) {
+      router.push(`/root/dynamic?path=/ComingSoon`);
+      return;
+    }
+    const routeMap: { [key: string]: string } = {
+      DROP: "BeautyDrop",
+      QUIZ: "GlowKnowQuiz",
+    };
+    const route = routeMap[event.type || ""] || "ComingSoon";
+    router.push(`/root/dynamic?path=/${route}`);
   };
 
   return (
-    <Container style={styles.container}>
-      {/* Title Section */}
-      <Section style={styles.titleSection}>
-        <Row style={styles.titleRow}>
-          <Row style={styles.titleContent}>
-            <Wrap>
-              <RText style={styles.mainTitle}>CosmePlay{"\n"}Event</RText>
-              <Image
-                source={{
-                  uri: "https://icons.veryicon.com/png/o/miscellaneous/ds/13-exclamation-mark.png",
-                }}
-                style={styles.titleIcon}
-              />
-            </Wrap>
-            <RText style={styles.subtitle}>Play, Win, Glow!</RText>
-          </Row>
+    <Context.Provider>
+      <Context.Consumer>
+        {({ ss }) => {
+          const events = ss.Joint?.Events ?? [];
 
-          <Row style={styles.actionButtons}>
-            <Button _type="Icon" _set={{ style: styles.actionButton }}>
-              <MaterialIcons name="history" size={24} color="black" />
-            </Button>
-            <Button _type="Icon" _set={{ style: styles.actionButton }}>
-              <FontAwesome5 name="home" size={24} color="black" />
-            </Button>
-          </Row>
-        </Row>
-      </Section>
-
-      {/* Games List */}
-      <ScrollView style={styles.gamesList} showsVerticalScrollIndicator={false}>
-        <Column style={styles.gamesContainer}>
-          {gameEvents.map((game) => (
-            // <Block style={styles.shadowWrapper}>
-            <Button
-              key={game.id}
-              _type="Icon"
-              _set={{
-                style: styles.gameCard,
-                onPress: () => handleGamePress(game),
-              }}
-            >
-              {() => (
-                <LinearGradient
-                  colors={game.gradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.gradientBackground}
-                >
-                  <Row style={styles.gameContent}>
-                    {/* Game Icon */}
-                    <Block style={styles.gameIconContainer}>
-                      {game.icon ? (
-                        <Image
-                          source={{ uri: game.icon }}
-                          style={styles.gameIconImage}
-                          resizeMode="cover"
-                        />
-                      ) : null}
-                    </Block>
-
-                    {/* Game Info */}
-                    <Column style={styles.gameInfo}>
-                      <RText style={styles.gameTitle}>{game.title}</RText>
-                      <RText style={styles.gameDescription}>
-                        {game.description}
+          return (
+            <Container style={styles.container}>
+              <Section style={styles.titleSection}>
+                <Row style={styles.titleRow}>
+                  <Row style={styles.titleContent}>
+                    <Wrap>
+                      <RText style={styles.mainTitle}>
+                        CosmePlay{"\n"}Event
                       </RText>
-                    </Column>
-
-                    {/* Coming Soon Badge */}
-                    {game.isComingSoon && (
-                      <Block style={styles.comingSoonBadge}>
-                        <RText style={styles.comingSoonText}>
-                          Coming soon...
-                        </RText>
-                      </Block>
-                    )}
+                      <Image
+                        source={{
+                          uri: "https://icons.veryicon.com/png/o/miscellaneous/ds/13-exclamation-mark.png",
+                        }}
+                        style={styles.titleIcon}
+                      />
+                    </Wrap>
+                    <RText style={styles.subtitle}>Play, Win, Glow!</RText>
                   </Row>
-                </LinearGradient>
-              )}
-            </Button>
-            // </Block>
-          ))}
-        </Column>
-      </ScrollView>
-    </Container>
+                  <Row style={styles.actionButtons}>
+                    <Button _type="Icon" _set={{ style: styles.actionButton }}>
+                      <MaterialIcons name="history" size={24} color="black" />
+                    </Button>
+                    <Button _type="Icon" _set={{ style: styles.actionButton }}>
+                      <FontAwesome5 name="home" size={24} color="black" />
+                    </Button>
+                  </Row>
+                </Row>
+              </Section>
+              <ScrollView
+                style={styles.gamesList}
+                showsVerticalScrollIndicator={false}
+              >
+                <Column style={styles.gamesContainer}>
+                  {events.map((event, index) => (
+                    <Button
+                      key={event.id || `event-${index}`}
+                      _type="Icon"
+                      _set={{
+                        style: styles.gameCard,
+                        onPress: () => handleGamePress(event),
+                      }}
+                    >
+                      {() => (
+                        <Block
+                          style={[
+                            styles.gradientBackground,
+                            {
+                              backgroundColor: getBackgroundColor(
+                                event.image_url,
+                                index
+                              ),
+                            },
+                          ]}
+                        >
+                          <Row style={styles.gameContent}>
+                            <Block style={styles.gameIconContainer}>
+                              {event.image_url ? (
+                                <Image
+                                  source={{ uri: event.image_url }}
+                                  style={styles.gameIconImage}
+                                  resizeMode="cover"
+                                />
+                              ) : null}
+                            </Block>
+                            <Column style={styles.gameInfo}>
+                              <RText style={styles.gameTitle}>
+                                {event.title || "Untitled Event"}
+                              </RText>
+                              <RText style={styles.gameDescription}>
+                                {event.description ||
+                                  "No description available"}
+                              </RText>
+                            </Column>
+                            {!event.is_active && (
+                              <Block style={styles.comingSoonBadge}>
+                                <RText style={styles.comingSoonText}>
+                                  Coming soon...
+                                </RText>
+                              </Block>
+                            )}
+                          </Row>
+                        </Block>
+                      )}
+                    </Button>
+                  ))}
+                </Column>
+              </ScrollView>
+            </Container>
+          );
+        }}
+      </Context.Consumer>
+    </Context.Provider>
   );
 }
 
@@ -204,7 +196,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
   },
-
   gamesList: {
     flex: 1,
   },
@@ -241,13 +232,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "relative",
   },
-  gameIconText: {
-    color: "black",
-    fontSize: 12,
-    fontWeight: "600",
-    textAlign: "center",
-    position: "absolute",
-  },
   gameIconImage: {
     width: "100%",
     height: "100%",
@@ -277,7 +261,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   comingSoonText: {
-    color: "#be185d", // pink-800
+    color: "#be185d",
     fontSize: 14,
     fontWeight: "bold",
     textAlign: "center",

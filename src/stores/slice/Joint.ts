@@ -8,6 +8,7 @@ export type State = {
     User?: IUser;
     QuizQuestions?: QuizQuestion[];
     EventReward?: EventReward[];
+    Events?: IEvent[];
   };
   setJointData(Obj: State["Joint"]): void;
   resetJoint(): void;

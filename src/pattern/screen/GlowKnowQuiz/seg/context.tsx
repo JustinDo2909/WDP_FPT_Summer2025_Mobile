@@ -63,19 +63,18 @@ export default GenCtx({
 
       //#region playEvent
       async playGame() {
-        // try {
-        //   await onCRUD({
-        //     Name: "events/play",
-        //   }).Post({
-        //     payload: {},
-        //   });
-        Toast.show({
-          type: "success",
-          text1: "Play Game successful",
-        });
-        // } catch (error) {
-        //   onError({ error });
-        // }
+        try {
+          await onCRUD({
+            Name: "events/play",
+          }).Post({
+            payload: {},
+          });
+          Toast.show({
+            type: "success",
+          });
+        } catch (error) {
+          onError({ error });
+        }
       },
 
       // #region

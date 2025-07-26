@@ -39,4 +39,8 @@ declare global {
   type IEventRewardResponse<T, N extends string> = Record<N, T[]> & {
     success: boolean;
   };
+
+  type IEventsResponse<T, N extends string> = Record<N, T[]> & {
+    success: boolean;
+  };
 }
