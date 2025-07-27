@@ -12,8 +12,8 @@ interface PurchaseItemProps {
 
 export function PurchaseItem({ orderItem, orderDate }: PurchaseItemProps) {
   const { title, price, image_url, quantity, product_id } = orderItem;
-  const {ss} = context.useCtx()
-  const {navigate} = useCustomRouter()
+  const { ss } = context.useCtx();
+  const { navigate } = useCustomRouter();
 
   const handleRepurchase = () => {
     Alert.alert("Repurchase", "Repurchase feature coming soon!");
@@ -21,7 +21,7 @@ export function PurchaseItem({ orderItem, orderDate }: PurchaseItemProps) {
 
   const handleFeedback = () => {
     ss.setPickData({ NavHeading: "Review a Product" });
-    navigate({pathSegments: ["ReviewProduct"], params: {productId: product_id}})
+    navigate({ pathSegments: ["ReviewProduct"], params: { productId: product_id } });
   };
 
   return (
@@ -30,8 +30,7 @@ export function PurchaseItem({ orderItem, orderDate }: PurchaseItemProps) {
         <View style={styles.imageContainer}>
           <Image
             source={{
-              uri:
-                image_url?.length > 0 ? image_url : "https://picsum.photos/80",
+              uri: image_url?.length > 0 ? image_url : "https://picsum.photos/80",
             }}
             style={styles.image}
             resizeMode="cover"
@@ -44,7 +43,6 @@ export function PurchaseItem({ orderItem, orderDate }: PurchaseItemProps) {
           <RText style={styles.description} numberOfLines={1}>
             Premium beauty product for daily use
           </RText>
-
           <Row style={styles.priceContainer}>
             <RText style={styles.costLabel}>Cost: </RText>
             <RText style={styles.currentPrice}>{formatPrice(price)}</RText>
@@ -52,8 +50,10 @@ export function PurchaseItem({ orderItem, orderDate }: PurchaseItemProps) {
             <RText style={styles.originalPrice}>
               {formatPrice(price * 1.2)}
             </RText>
+            <RText style={styles.quantity}>
+            x {quantity}
+          </RText>
           </Row>
-
           <Row style={styles.buttonContainer}>
             <Button
               _type="Stroke"
@@ -64,7 +64,6 @@ export function PurchaseItem({ orderItem, orderDate }: PurchaseItemProps) {
             >
               <RText style={styles.buttonText}>Repurchase</RText>
             </Button>
-
             <Button
               _type="Stroke"
               _set={{
@@ -123,6 +122,11 @@ const styles = StyleSheet.create({
     color: "#6b7280",
     lineHeight: 18,
   },
+  quantity: {
+    fontSize: 14,
+    color: "#374151",
+    fontWeight: "500",
+  },
   priceContainer: {
     alignItems: "center",
     flexWrap: "wrap",
@@ -157,7 +161,7 @@ const styles = StyleSheet.create({
     borderColor: "#F23059",
     borderRadius: 6,
     minWidth: 100,
-    height: 28
+    height: 28,
   },
   feedbackButton: {
     paddingHorizontal: 16,
@@ -165,7 +169,7 @@ const styles = StyleSheet.create({
     borderColor: "#6b7280",
     borderRadius: 6,
     minWidth: 80,
-    height: 28
+    height: 28,
   },
   buttonText: {
     fontSize: 14,
