@@ -14,5 +14,9 @@ export const useCustomRouter = () => {
     router.push(`/root/dynamic?${queryParams}` as any);
   };
 
-  return { navigate };
+  const canGoBack = () => router.canGoBack();
+
+  const back = () => router.back();
+
+  return { navigate, canGoBack, back };
 };

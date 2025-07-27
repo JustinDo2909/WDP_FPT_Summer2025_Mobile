@@ -30,9 +30,9 @@ export function Checkout() {
           showVoucherPicker,
           setShowVoucherPicker,
           subtotal,
-          discount,
           shippingFee,
           total,
+          discount,
           isLoading,
           meds,
         }) => (
@@ -118,7 +118,7 @@ export function Checkout() {
                   {/* Order Summary */}
                   <OrderSummary
                     subtotal={subtotal}
-                    discount={discount}
+                    voucherDiscount={discount}
                     shippingFee={shippingFee}
                     total={total}
                   />
@@ -189,6 +189,7 @@ export function Checkout() {
             {/* Voucher Picker Modal */}
             <Modal visible={showVoucherPicker} animationType="slide">
               <VoucherPicker
+                cartItems={cartItems}
                 vouchers={vouchers}
                 onSelect={(voucher) => {
                   setSelectedVoucher(voucher);

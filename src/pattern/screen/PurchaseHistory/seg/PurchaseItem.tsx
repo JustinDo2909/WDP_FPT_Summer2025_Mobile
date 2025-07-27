@@ -1,7 +1,9 @@
 import { Button, Card, Column, Row, RText } from "@/src/libs/by";
+import { useCustomRouter } from "@/src/libs/hooks/useCustomRouter";
 import { formatPrice } from "@/src/libs/share/formatPrice";
 import React from "react";
 import { Alert, Image, StyleSheet, View } from "react-native";
+import context from "./context";
 
 interface PurchaseItemProps {
   orderItem: IOrderItem;
@@ -9,14 +11,17 @@ interface PurchaseItemProps {
 }
 
 export function PurchaseItem({ orderItem, orderDate }: PurchaseItemProps) {
-  const { title, price, image_url, quantity } = orderItem;
+  const { title, price, image_url, quantity, product_id } = orderItem;
+  const {ss} = context.useCtx()
+  const {navigate} = useCustomRouter()
 
   const handleRepurchase = () => {
     Alert.alert("Repurchase", "Repurchase feature coming soon!");
   };
 
   const handleFeedback = () => {
-    Alert.alert("Feedback", "Feedback feature coming soon!");
+    ss.setPickData({ NavHeading: "Review a Product" });
+    navigate({pathSegments: ["ReviewProduct"], params: {productId: product_id}})
   };
 
   return (

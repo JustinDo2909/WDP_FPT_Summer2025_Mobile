@@ -12,8 +12,6 @@ declare global {
     product_id: string;
     quantity: number;
   };
-
-
   type IAddress = {
     id?: string;
     user_id: string;
@@ -31,7 +29,12 @@ declare global {
     ward: string;
   }
 
-   type IVoucher = {
+
+   type IVoucherProduct = {
+    product: IProduct;
+  };
+
+  type IVoucher = {
     id: string;
     user_id: string;
     event_reward_id: string;
@@ -41,6 +44,7 @@ declare global {
     redeemed: boolean;
     redeemed_at: string | null;
     created_at: string;
+    voucherProducts?: IVoucherProduct[];
   }
 
 

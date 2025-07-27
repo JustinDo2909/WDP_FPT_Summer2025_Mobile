@@ -19,7 +19,7 @@ export function ProductDetails() {
   return (
     <Context.Provider>
       <Context.Consumer>
-        {({ ss }) => {
+        {({ ss, reviews }) => {
           const product = ss.Joint.Product;
           return (
             <Container style={styles.container}>
@@ -27,7 +27,7 @@ export function ProductDetails() {
                 {product &&<>
                 <ProductGallery product={product} />
                 <ProductInfo product={product} />
-                <ProductReview product={product} />
+                <ProductReview reviews={reviews} rating={product.rating} />
                 </>
                 }
               </ScrollView>

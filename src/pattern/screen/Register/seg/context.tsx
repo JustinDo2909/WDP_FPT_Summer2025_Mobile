@@ -14,14 +14,15 @@ export default GenCtx({
   useLogic() {
     type IForm = {
       fields: {
+        name: string;
         email: string;
         password: string;
       };
     };
     const ss = sStore();
 
+    const {navigate} = useCustomRouter() 
     const router = useRouter()
-    const {navigate} = useCustomRouter()
 
     const methods = useForm<IForm>({
       mode: "onChange",
@@ -53,15 +54,12 @@ export default GenCtx({
       },
       //#endregion
 
-       //#region navtoRegis
+      //#region navtoLogin
        navigateToRegis() {
-        router.push("/auth?type=register");       
-      },
+        router.push("/auth?type=sign-up");       
+        },
 
       //#endregion
-
-
-
 
       //#region onGetUser
       async onGetUser() {
@@ -82,33 +80,28 @@ export default GenCtx({
       },
       //#endRegion
 
-      //#region onSignIn
-      async onSignIn({ fields }: IForm) {
+      //#region onRegister
+      async onRegister({ fields }: IForm) {
         try {
           setLoading(true);
           const { data: dUser }: AxiosResponse<any> = await onCRUD({
-            Name: "auth/login",
+            Name: "auth/register",
           }).Post({
             payload: {
+              name: fields.name,
               email: fields.email,
               password: fields.password,
             },
           });
 
-          if (dUser.success) {
-            AsyncStorage.setItem("jwt", dUser.accessToken);
-          }
-
-          await meds.onGetUser();
-          await meds.onGetCart();
-
           Toast.show({
             type: "success",
-            text1: "Logged in successfully!",
+            text1: "Success! Verify your email at " + fields.email,
+            visibilityTime: 10000
           });
 
           delay(() => {
-            navigate({pathSegments:["Home"]})
+            router.push("/auth?type=sign-in");
             setLoading(false);
           }, 500);
         } catch (error) {

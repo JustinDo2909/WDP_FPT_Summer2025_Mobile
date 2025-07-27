@@ -1,21 +1,45 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { FlatList, StyleSheet, View, TouchableOpacity, Image } from "react-native";
 import { RText } from "@/src/libs/by";
 import { formatPrice } from "@/src/libs/share/formatPrice";
 import { VoucherCard } from "@/src/pattern/share/VoucherCard";
+import context from "./context";
 
-export function VoucherPicker({ vouchers, onSelect, selectedId }: {
+export function VoucherPicker({ vouchers, onSelect, selectedId, cartItems }: {
   vouchers: IVoucher[];
   onSelect: (voucher: IVoucher) => void;
   selectedId?: string;
+  cartItems: ICartLineItem[]
 }) {
+
+  const {meds} = context.useCtx()
+
+  const cartProductIds = useMemo(
+    () => cartItems.map(item => item.product_id),
+    [cartItems]
+  );
+
+  const sortedVouchers = useMemo(() => {
+    if (!vouchers) return [];
+    return vouchers
+      .map(voucher => {
+        const applicable = Array.isArray(voucher.voucherProducts) &&
+          voucher.voucherProducts.some(vp => cartProductIds.includes(vp.product.id));
+        const savings = applicable ? meds.calculateVoucherSavings(voucher, cartItems) : 0;
+        return { id : voucher.id, voucher, applicable, savings };
+      })
+      .sort((a, b) => {
+        if (a.applicable !== b.applicable) return a.applicable ? -1 : 1;
+        return b.savings - a.savings; // Sort by savings in descending order
+      });
+  }, [vouchers, cartProductIds, cartItems]);
   return (
     <View style={styles.container}>
       <FlatList
-        data={vouchers}
+        data={sortedVouchers}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
-          <VoucherCard onUse={onSelect} voucher={item} buttonText="Apply"/>
+          <VoucherCard applicable={item.applicable} onUse={onSelect} voucher={item.voucher} buttonText="Apply" savings={item.savings}/>
         )}
       />
     </View>

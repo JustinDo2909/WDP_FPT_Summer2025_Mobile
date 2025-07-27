@@ -23,6 +23,7 @@ export function Vouchers() {
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <VoucherCard
+                  applicable={true}
                   voucher={item}
                   onUse={(v) => meds.onUseVoucher(v)}
                 />

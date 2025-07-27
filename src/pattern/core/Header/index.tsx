@@ -1,14 +1,17 @@
 import { Block, RText, Wrap } from "@/src/libs/by";
-import { useCustomRouter } from "@/src/libs/hooks/useCustomRouter";
-import { onCRUD } from "@/src/process/api/regular";
 import { init } from "@/src/process/constants";
 import { sStore } from "@/src/stores";
-import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { router, useGlobalSearchParams, useRouter } from "expo-router";
 import { find, isEqual, last, split } from "lodash";
-import { useRef, useState } from "react";
-import { TextInput, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, TextInput, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useCustomRouter } from "@/src/libs/hooks/useCustomRouter";
+import { useState, useRef } from "react";
+import { onCRUD } from "@/src/process/api/regular";
+
+const list = ["SignIn", "Cart", "Checkout", "History Purchase", "Vouchers", "PurchaseHistory"];
+
 
 export function Header() {
   const ss = sStore();
@@ -95,6 +98,8 @@ export function Header() {
         shadowOpacity: 0.15,
         shadowRadius: 6,
         elevation: 6,
+        zIndex: 9999, // Ensure header is above other content
+        overflow: 'visible', // Prevent clipping of dropdown
       }}
     >
       <Block
@@ -107,77 +112,75 @@ export function Header() {
       >
         <RenderTitle />
 
-        {ss.Pick?.NavHeading !== "Shopping Cart" &&
-          ss.Pick?.NavHeading !== "Checkout" &&
-          ss.Pick?.NavHeading !== "History Purchase" &&
-          ss.Pick.NavHeading !== "Vouchers" && (
-            <>
-              <View
+        {(ss.Pick?.NavHeading !== "Shopping Cart" && ss.Pick?.NavHeading !== "Checkout" && ss.Pick?.NavHeading !== "Cart" && ss.Pick?.NavHeading !== "History Purchase" && ss.Pick.NavHeading !== "Vouchers" && ss.Pick.NavHeading !== "Purchase History")  && (
+          <>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "white",
+                borderRadius: 20,
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 16,
+                paddingVertical: 2,
+              }}
+            >
+              <Ionicons
+                name="search"
+                size={20}
+                color="#999"
+                style={{ marginRight: 8 }}
+              />
+              <TextInput
+                placeholder="Search your product"
                 style={{
                   flex: 1,
-                  backgroundColor: "white",
-                  borderRadius: 20,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  paddingHorizontal: 16,
-                  paddingVertical: 2,
+                  fontSize: 12,
+                  color: "#333",
                 }}
+                placeholderTextColor="#999"
+              />
+            </View>
+            {isLoggedIn && (
+              <TouchableOpacity
+                onPress={() => {
+                  ss.setPickData({ NavHeading: "Shopping Cart" });
+                  ss.setPickData({ ActiveTab: ""  });
+                  navigate({ pathSegments: ["Cart"] });
+                }}
+                style={{ padding: 8 }}
               >
-                <Ionicons
-                  name="search"
-                  size={20}
-                  color="#999"
-                  style={{ marginRight: 8 }}
-                />
-                <TextInput
-                  placeholder="Search your product"
-                  style={{
-                    flex: 1,
-                    fontSize: 12,
-                    color: "#333",
-                  }}
-                  placeholderTextColor="#999"
-                />
-              </View>
-              {isLoggedIn && (
-                <TouchableOpacity
-                  onPress={() => {
-                    ss.setPickData({ NavHeading: "Shopping Cart" });
-                    navigate({ pathSegments: ["Cart"] });
-                  }}
-                  style={{ padding: 8 }}
-                >
-                  <Ionicons name="bag-outline" size={24} color="white" />
-                  {cartQuantity > 0 && (
-                    <View
+                <Ionicons name="bag-outline" size={24} color="white" />
+                {cartQuantity > 0 && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: 2,
+                      right: 2,
+                      backgroundColor: "#fff",
+                      borderRadius: 8,
+                      minWidth: 16,
+                      height: 16,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      paddingHorizontal: 4,
+                    }}
+                  >
+                    <RText
                       style={{
-                        position: "absolute",
-                        top: 2,
-                        right: 2,
-                        backgroundColor: "#fff",
-                        borderRadius: 8,
-                        minWidth: 16,
-                        height: 16,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        paddingHorizontal: 4,
+                        color: "#FF4F81",
+                        fontSize: 16,
+                        fontWeight: "bold",
                       }}
                     >
-                      <RText
-                        style={{
-                          color: "#FF4F81",
-                          fontSize: 16,
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {cartQuantity}
-                      </RText>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              )}
-            </>
-          )}
+                      {cartQuantity}
+                    </RText>
+                  </View>
+                )}
+              </TouchableOpacity>
+            )}
+          </>
+        )}
 
         {isLoggedIn ? (
           <>
@@ -197,7 +200,6 @@ export function Header() {
                         height: 4,
                         borderRadius: 2,
                         backgroundColor: "white",
-                        zIndex: 99,
                       }}
                     />
                   ))}
@@ -233,7 +235,6 @@ const RenderTitle = () => {
   const ss = sStore();
   const params = useGlobalSearchParams<any>();
   const gFnID = last(split(String(params?.path), "/"));
-  const list = ["Home", "SignIn", "Shopping Cart"];
   const fnc = find(list, (ele) => isEqual(ele, gFnID));
 
   const BtnBack = (
@@ -242,7 +243,14 @@ const RenderTitle = () => {
         if (router.canGoBack()) {
           router.back();
         }
-        ss.setPickData({ NavHeading: "" });
+        switch (fnc) {
+          case "Checkout":
+            ss.setPickData({ NavHeading: "Shopping Cart" });
+            break;
+          default:
+            ss.setPickData({ NavHeading: "" });
+            break;
+        }
       }}
       style={{ padding: 4 }}
     >
@@ -254,11 +262,11 @@ const RenderTitle = () => {
     </TouchableOpacity>
   );
 
-  if (ss.Pick?.NavHeading) {
+  if (ss.Pick?.NavHeading || fnc) {
     return (
       <Wrap style={{ gap: 16, alignItems: "center" }}>
         {BtnBack}
-        {ss.Pick?.NavHeading !== "Back" && (
+        {(ss.Pick?.NavHeading !== "Back" && fnc) && (
           <RText
             style={{
               fontWeight: 600,
@@ -267,14 +275,13 @@ const RenderTitle = () => {
               paddingVertical: 14,
             }}
           >
-            {ss.Pick?.NavHeading || fnc}
+            {splitCamelCase(ss.Pick?.NavHeading || fnc)}
           </RText>
         )}
       </Wrap>
     );
   }
-
-  // return (
-  //   <RText>Logo</RText>
-  // );
 };
+
+const splitCamelCase = (str: string) =>
+  str ? str.replace(/([a-z])([A-Z])/g, '$1 $2') : '';

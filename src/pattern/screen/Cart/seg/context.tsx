@@ -110,7 +110,7 @@ export default GenCtx({
 
       calculateTotal() {
         if (!cart?.cartItems) return 0;
-        return cart.cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+        return cart.cartItems.reduce((sum, item) => sum + (item.product.sale_price ?? item.product.price) * item.quantity, 0);
       },
 
       formatCurrency(amount: number) {

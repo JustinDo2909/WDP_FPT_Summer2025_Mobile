@@ -3,13 +3,14 @@ import { GenCtx } from "@/src/process/hooks";
 import { sStore } from "@/src/stores";
 import { AxiosResponse } from "axios";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Toast from "react-native-toast-message";
 
 export default GenCtx({
   useLogic() {
     const ss = sStore();
+    const [reviews, setReviews] = useState<IReview[]>()
     const methods = useForm({
       mode: "all",
       defaultValues: {
@@ -34,6 +35,24 @@ export default GenCtx({
               fields: data?.product,
               filters: {},
             });
+          }
+        } catch (error) {
+          onError({ error });
+        }
+      },
+      //#endregion
+
+       //#region getReviews
+      async getReviews(productId: string) {
+        try {
+          const { data }: AxiosResponse<IResponse<IReview[], "reviews">> =
+            await onCRUD({
+              Name: `reviews/${productId}`,
+            }).Get({
+            });
+
+          if (data?.reviews) {
+            setReviews(data.reviews)
           }
         } catch (error) {
           onError({ error });
@@ -107,6 +126,7 @@ export default GenCtx({
       ss.setJointData({ Product: undefined });
       if (productId) {
         meds.getProductById(productId);
+        meds.getReviews(productId)
       }
     }, []);
 
@@ -120,6 +140,6 @@ export default GenCtx({
 
     //#endregion
 
-    return { meds, methods, ss };
+    return { reviews, meds, methods, ss };
   },
 });

@@ -6,6 +6,8 @@ import { MaterialIcons, Ionicons, FontAwesome5, MaterialCommunityIcons } from "@
 import { map } from "lodash";
 import { useRouter } from "expo-router";
 import { sStore } from "@/src/stores";
+import { init } from "@/src/process/constants";
+import React from "react";
 
 const tabs = [
   { key: "Home", label: "Home", icon: <MaterialIcons name="home" size={24} color="black" /> },
@@ -18,8 +20,11 @@ const tabs = [
 
 export function Footer() {
   const route = useRoute();
-  const router = useRouter()
-  const ss = sStore()
+  const router = useRouter();
+  const ss = sStore();
+
+  const activeTab = ss.Pick.ActiveTab ?? "Home";
+
   if (route.name === "ProductDetails") {
     return null;
   }
@@ -35,27 +40,33 @@ export function Footer() {
         paddingHorizontal: 12,
         borderTopWidth: 0.5,
         borderTopColor: "#eee",
-         shadowColor: "#000",
+        shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.15,
         shadowRadius: 6,
         elevation: 6,
       }}
     >
-      {map(tabs, tab => (
-        <TouchableOpacity
-          key={tab.key}
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          onPress={() => {  
-            ss.setPickData({NavHeading: ""})
-            router.push(`/root/dynamic?path=/${tab.key}`);
-          }}
-          activeOpacity={0.7}
-        >
-          {tab.icon}
-          <RText style={{ fontSize: 14, color: "black", marginTop: 2 }}>{tab.label}</RText>
-        </TouchableOpacity>
-      ))}
+      {map(tabs, tab => {
+        const isActive = activeTab === tab.key || route.name === tab.key;
+        return (
+          <TouchableOpacity
+            key={tab.key}
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+            onPress={() => {
+              ss.setPickData({ ActiveTab: tab.key  });
+              ss.setPickData({NavHeading: ""})
+              router.push(`/root/dynamic?path=/${tab.key}`);
+            }}
+            activeOpacity={0.7}
+          >
+            {React.cloneElement(tab.icon, { color: isActive ? init.Color.PrimaryBrand : "black" })}
+            <RText style={{ fontSize: 14, color: isActive ? init.Color.PrimaryBrand : "black", marginTop: 2 }}>
+              {tab.label}
+            </RText>
+          </TouchableOpacity>
+        );
+      })}
     </Core>
   );
 }

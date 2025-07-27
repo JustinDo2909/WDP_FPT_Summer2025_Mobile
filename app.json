@@ -6,7 +6,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.yourcompany.wdpmobile" 
+      "package": "com.yourcompany.wdpmobile"
     },
     "experiments": {
       "typedRoutes": true
@@ -38,6 +38,18 @@
       "bundler": "metro",
       "favicon": "./assets/images/favicon.png",
       "output": "static"
-    }
+    },
+    "extra": {
+      "GHN_API_TOKEN": "2097f4fe-1bfe-11f0-8aaa-9ed348b01f47",
+      "GHN_CLIENT_ID": "4738388",
+      "GHN_SHOP_ID": "5738915",
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "19089fc5-380a-4467-acb3-2c08563bb339"
+      }
+    },
+    "owner": "winnguten"
   }
 }

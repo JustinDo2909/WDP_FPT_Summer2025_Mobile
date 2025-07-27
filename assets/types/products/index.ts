@@ -46,13 +46,13 @@ declare global {
     skinTypes: ISkinType[];
   };
   type IReview = {
-    review_id: number;
-    product_id: number;
-    r_id: string;
-    r_name: string;
-    r_value: number;
-    r_message: string;
-    created_at: string;
+    id: string;
+    user_id: string;
+    product_id: string;
+    user_name: string;
+    review_value: number;
+    review_message: string;
+    createdAt: Date;
   };
 }
 
