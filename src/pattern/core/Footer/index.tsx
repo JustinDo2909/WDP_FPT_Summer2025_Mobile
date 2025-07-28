@@ -23,7 +23,7 @@ export function Footer() {
   const router = useRouter();
   const ss = sStore();
 
-  const activeTab = ss.Pick.ActiveTab || "Home";
+  const activeTab = ss.Pick.ActiveTab;
 
   if (route.name === "ProductDetails") {
     return null;

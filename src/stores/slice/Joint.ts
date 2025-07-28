@@ -3,6 +3,7 @@ import { StateCreator } from "zustand";
 export type State = {
   Joint: {
     Product?: IProduct;
+    SearchQuery?: string;
     Products?: IProduct[];
     Cart?: ICart;
     User?: IUser;

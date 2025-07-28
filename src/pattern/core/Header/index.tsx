@@ -10,7 +10,7 @@ import { useCustomRouter } from "@/src/libs/hooks/useCustomRouter";
 import { useState, useRef } from "react";
 import { onCRUD } from "@/src/process/api/regular";
 
-const list = ["SignIn", "Cart", "Checkout", "History Purchase", "Vouchers", "PurchaseHistory", "ReviewProduct", "Review A Product"];
+const list = ["SignIn", "Cart", "Checkout", "History Purchase", "Vouchers", "PurchaseHistory", "ReviewProduct", "Review A Product", "GlowKnowQuiz", "BeautyDrop"];
 
 
 export function Header() {
@@ -142,6 +142,11 @@ export function Header() {
                   color: "#333",
                 }}
                 placeholderTextColor="#999"
+                returnKeyType="search"
+                defaultValue={ss.Joint.SearchQuery ?? ""}
+                onSubmitEditing={e => {
+                  ss.setJointData({ SearchQuery: e.nativeEvent.text });
+                }}
               />
             </View>
             {isLoggedIn && (

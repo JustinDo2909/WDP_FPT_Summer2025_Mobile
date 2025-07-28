@@ -21,10 +21,11 @@ export default GenCtx({
       //#region getProduct
       async onGetProducts() {
         try {
+          const searchQuery = ss.Joint.SearchQuery ?? "";
           const { data }: AxiosResponse<IPaginatedResponse<IProduct, 'products'>> = await onCRUD({
             Name: "products",
           }).Get({
-            payload: {},
+            payload: searchQuery ? { title: searchQuery } : {},
           });
 
           if (data?.products) {
@@ -83,10 +84,10 @@ export default GenCtx({
 
 
     useEffect(() => {
-      ss.resetPick()
-      ss.setPickData({ActiveTab: "Home"})
+      ss.resetPick();
+      ss.setPickData({ActiveTab: "Home"});
       meds.onGetProducts();
-    }, []);
+    }, [ss.Joint.SearchQuery]);
 
     //#endregion
 

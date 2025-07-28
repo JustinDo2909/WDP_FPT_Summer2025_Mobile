@@ -95,7 +95,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, cardWidth }) => {
                 {rating != null ? Number(rating).toFixed(2) : "N/A"}
               </RText>
               <MaterialIcons name="star" size={14} color="#facc15" />
-              <RText style={styles.reviewCount}>{reviews_count ?? "N/A"}</RText>
+              {/* <RText style={styles.reviewCount}>{reviews_count ?? "N/A"}</RText> */}
             </Row>
 
             {/* Add to Cart */}
@@ -105,7 +105,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, cardWidth }) => {
             }>
               <Row style={styles.cartRow}>
                 {/* <RText style={styles.cartText}>Add To Cart</RText> */}
-                <MaterialIcons name="shopping-basket" size={24} color="#6366f1" />
+                <MaterialIcons name="shopping-basket" size={30} color="#6366f1" /> 
               </Row>
             </TouchableOpacity>
             {/* </AddToCartWrapper> */}

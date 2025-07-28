@@ -3,6 +3,7 @@ import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import context from "./context"; // Adjust if your context hook is named differently
+import { init } from "@/src/process/constants";
 
 
 export function AddAddressForm({ onSave, initialShippingInfo }: { onSave: (address: IAddress) => void; initialShippingInfo?: IAddress }) {
@@ -269,14 +270,16 @@ const styles = StyleSheet.create({
   container: { padding: 16, backgroundColor: "#fff" },
   title: { fontWeight: "bold", fontSize: 18, marginBottom: 12 },
   label: { fontWeight: "bold", marginTop: 8, marginBottom: 4 },
-  input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 10, marginBottom: 4, backgroundColor: "#f9f9f9" },
+  input: { borderRadius: 8, padding: 10},
   inputError: { borderColor: "#F23059" },
   error: { color: "#F23059", fontSize: 12, marginBottom: 2 },
   row: { flexDirection: "row", gap: 12 },
   flex1: { flex: 1, minWidth: 0 },
-  picker: { height: 40, width: "100%", backgroundColor: "transparent" },
+  picker: { height: 50, width: "100%", backgroundColor: "transparent", borderWidth: 1, fontSize: 12,
+      borderColor: init.Color.BgDisableTextfileld,
+      borderRadius: 6, padding: 0 },
   buttonRow: { flexDirection: "row", justifyContent: "flex-end", gap: 12, marginTop: 16 },
-  button: { borderRadius: 8, paddingVertical: 12, paddingHorizontal: 24, backgroundColor: "#F23059", shadowColor: "transparent", elevation: 0 },
+  button: { borderRadius: 8, paddingVertical: 12, paddingHorizontal: 24, backgroundColor: "#F23059", shadowColor: "transparent", elevation: 0, height: 40 },
   cancelBtn: { backgroundColor: "#eee", marginRight: 8, shadowColor: "transparent", elevation: 0 },
   saveBtn: { backgroundColor: "#F23059", shadowColor: "transparent", elevation: 0 },
   cancelText: { color: "#333", fontWeight: "bold" },

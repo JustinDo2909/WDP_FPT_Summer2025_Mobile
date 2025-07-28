@@ -41,6 +41,7 @@ export default GenCtx({
 
     useEffect(() => {
       ss.resetPick();
+      ss.setPickData({ActiveTab: "Event"})
       meds.onGetEvents();
     }, []);
 

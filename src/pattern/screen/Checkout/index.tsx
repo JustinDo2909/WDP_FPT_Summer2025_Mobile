@@ -61,7 +61,7 @@ export function Checkout() {
                         <RText style={styles.cardTitle}>Shipping</RText>
                         <RText style={styles.cardSubtitle}>
                           {selectedAddress
-                            ? `${selectedAddress.fullname}, ${selectedAddress.address}, ${selectedAddress.city}`
+                            ? `${selectedAddress.phone}, ${selectedAddress.address}, ${selectedAddress.city}`
                             : "Add shipping address"}
                         </RText>
                       </View>
