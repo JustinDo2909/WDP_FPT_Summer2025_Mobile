@@ -10,19 +10,22 @@ import { useCustomRouter } from "@/src/libs/hooks/useCustomRouter";
 import { useState, useRef } from "react";
 import { onCRUD } from "@/src/process/api/regular";
 
-const list = ["SignIn", "Cart", "Checkout", "History Purchase", "Vouchers", "PurchaseHistory"];
+const list = ["SignIn", "Cart", "Checkout", "History Purchase", "Vouchers", "PurchaseHistory", "ReviewProduct", "Review A Product"];
 
 
 export function Header() {
   const ss = sStore();
   const { navigate } = useCustomRouter();
+  const params = useGlobalSearchParams<any>();
+  const gFnID = last(split(String(params?.path), "/"));
   const router = useRouter();
   const isLoggedIn = ss?.Auth.User !== undefined;
   const cartQuantity = ss.Joint.Cart?.cartItems.length ?? 0;
   const [menuOpen, setMenuOpen] = useState(false);
   const menuButtonRef = useRef(null);
-
+  const showHeaderBar = gFnID === "undefined" || gFnID == "Home" || gFnID == "ProfileMenu" || gFnID == "Event"
   // Import onCRUD for logout
+  // console.log(showHeaderBar, gFnID === "undefined")
 
   // Dropdown menu component
   const DropdownMenu = () =>
@@ -112,7 +115,7 @@ export function Header() {
       >
         <RenderTitle />
 
-        {(ss.Pick?.NavHeading !== "Shopping Cart" && ss.Pick?.NavHeading !== "Checkout" && ss.Pick?.NavHeading !== "Cart" && ss.Pick?.NavHeading !== "History Purchase" && ss.Pick.NavHeading !== "Vouchers" && ss.Pick.NavHeading !== "Purchase History")  && (
+        {showHeaderBar  && (
           <>
             <View
               style={{
@@ -236,6 +239,7 @@ const RenderTitle = () => {
   const params = useGlobalSearchParams<any>();
   const gFnID = last(split(String(params?.path), "/"));
   const fnc = find(list, (ele) => isEqual(ele, gFnID));
+  console.log("fnc", fnc)
 
   const BtnBack = (
     <TouchableOpacity
@@ -247,6 +251,9 @@ const RenderTitle = () => {
           case "Checkout":
             ss.setPickData({ NavHeading: "Shopping Cart" });
             break;
+          case "ReviewProduct":
+            ss.setPickData({ NavHeading: "History Purchase" });
+            break;  
           default:
             ss.setPickData({ NavHeading: "" });
             break;

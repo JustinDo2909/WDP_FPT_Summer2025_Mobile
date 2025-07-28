@@ -23,7 +23,7 @@ export function Footer() {
   const router = useRouter();
   const ss = sStore();
 
-  const activeTab = ss.Pick.ActiveTab ?? "Home";
+  const activeTab = ss.Pick.ActiveTab || "Home";
 
   if (route.name === "ProductDetails") {
     return null;
@@ -48,15 +48,14 @@ export function Footer() {
       }}
     >
       {map(tabs, tab => {
-        const isActive = activeTab === tab.key || route.name === tab.key;
+        const isActive = activeTab === tab.key
         return (
           <TouchableOpacity
             key={tab.key}
             style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
             onPress={() => {
-              ss.setPickData({ ActiveTab: tab.key  });
-              ss.setPickData({NavHeading: ""})
-              router.push(`/root/dynamic?path=/${tab.key}`);
+              ss.setPickData({ ActiveTab: tab.key, NavHeading: "" });
+              router.replace(`/root/dynamic?path=/${tab.key}`);
             }}
             activeOpacity={0.7}
           >

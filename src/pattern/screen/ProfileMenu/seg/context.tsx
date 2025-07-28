@@ -44,6 +44,7 @@ export default GenCtx({
 
     useEffect(() => {
       ss.resetPick()
+      ss.setPickData({ActiveTab: "ProfileMenu"})
       meds.onGetProducts();
     }, []);
 

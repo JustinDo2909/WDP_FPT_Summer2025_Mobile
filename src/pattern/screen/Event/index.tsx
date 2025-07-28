@@ -32,6 +32,7 @@ export function Event() {
           useEffect(() => {
             if (ss.Joint.Events && ss.Joint.Events.length >= 0) {
               setIsLoading(false);
+              ss.setPickData({ActiveTab: "Event"})
             }
           }, [ss.Joint.Events]);
 

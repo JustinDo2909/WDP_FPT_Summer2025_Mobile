@@ -24,6 +24,8 @@ export function PurchaseItem({ orderItem, orderDate }: PurchaseItemProps) {
     navigate({ pathSegments: ["ReviewProduct"], params: { productId: product_id } });
   };
 
+  const totalPrice = price * quantity;
+
   return (
     <Card style={styles.card}>
       <Row style={styles.container}>
@@ -35,6 +37,9 @@ export function PurchaseItem({ orderItem, orderDate }: PurchaseItemProps) {
             style={styles.image}
             resizeMode="cover"
           />
+          <View style={styles.quantityBadge}>
+            <RText style={styles.quantityText}>x {quantity}</RText>
+          </View>
         </View>
         <Column style={styles.detailsContainer}>
           <RText style={styles.title} numberOfLines={2}>
@@ -43,17 +48,18 @@ export function PurchaseItem({ orderItem, orderDate }: PurchaseItemProps) {
           <RText style={styles.description} numberOfLines={1}>
             Premium beauty product for daily use
           </RText>
-          <Row style={styles.priceContainer}>
-            <RText style={styles.costLabel}>Cost: </RText>
-            <RText style={styles.currentPrice}>{formatPrice(price)}</RText>
-            <RText style={styles.arrow}> → </RText>
-            <RText style={styles.originalPrice}>
-              {formatPrice(price * 1.2)}
-            </RText>
-            <RText style={styles.quantity}>
-            x {quantity}
-          </RText>
-          </Row>
+          
+          <View style={styles.priceSection}>
+            <Row style={styles.priceRow}>
+              <RText style={styles.unitPriceLabel}>Unit price: </RText>
+              <RText style={styles.unitPrice}>{formatPrice(price)}</RText>
+            </Row>
+            <Row style={styles.totalPriceRow}>
+              <RText style={styles.totalLabel}>Total: </RText>
+              <RText style={styles.totalPrice}>{formatPrice(totalPrice)}</RText>
+            </Row>
+          </View>
+          
           <Row style={styles.buttonContainer}>
             <Button
               _type="Stroke"
@@ -83,14 +89,8 @@ export function PurchaseItem({ orderItem, orderDate }: PurchaseItemProps) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
     marginBottom: 12,
-    marginHorizontal: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    padding: 16,
   },
   container: {
     alignItems: "flex-start",
@@ -99,13 +99,30 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: 80,
     height: 80,
-    borderRadius: 8,
+    borderRadius: 12,
     overflow: "hidden",
-    backgroundColor: "#fce7f3",
+    backgroundColor: "#f8fafc",
+    position: "relative",
   },
   image: {
     width: "100%",
     height: "100%",
+  },
+  quantityBadge: {
+    position: "absolute",
+    top: -4,
+    right: -4,
+    borderRadius: 1000,
+    minWidth: 24,
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 6,
+  },
+  quantityText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#1f2937",
   },
   detailsContainer: {
     flex: 1,
@@ -113,72 +130,80 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
     color: "#1f2937",
-    lineHeight: 20,
+    lineHeight: 22,
   },
   description: {
-    fontSize: 14,
+    fontSize: 13,
     color: "#6b7280",
     lineHeight: 18,
   },
-  quantity: {
-    fontSize: 14,
-    color: "#374151",
-    fontWeight: "500",
+  priceSection: {
+    gap: 4,
+    paddingVertical: 4,
+    backgroundColor: "#f8fafc",
+    paddingHorizontal: 12,
+    borderRadius: 8,
   },
-  priceContainer: {
+  priceRow: {
     alignItems: "center",
-    flexWrap: "wrap",
   },
-  costLabel: {
-    fontSize: 14,
-    color: "#374151",
+  totalPriceRow: {
+    alignItems: "center",
+  },
+  unitPriceLabel: {
+    fontSize: 13,
+    color: "#6b7280",
     fontWeight: "500",
   },
-  currentPrice: {
+  unitPrice: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#374151",
+  },
+  totalLabel: {
+    fontSize: 14,
+    color: "#374151",
+    fontWeight: "600",
+  },
+  totalPrice: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#ef4444",
-  },
-  arrow: {
-    fontSize: 14,
-    color: "#6b7280",
-    marginHorizontal: 4,
-  },
-  originalPrice: {
-    fontSize: 14,
-    color: "#6b7280",
-    textDecorationLine: "line-through",
+    color: "#F23059",
   },
   buttonContainer: {
     gap: 8,
-    marginTop: 4,
+    marginTop: 8,
   },
   repurchaseButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     borderColor: "#F23059",
-    borderRadius: 6,
-    minWidth: 100,
-    height: 28,
+    borderWidth: 1.5,
+    borderRadius: 8,
+    flex: 1,
+    height: 36,
   },
   feedbackButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderColor: "#6b7280",
-    borderRadius: 6,
-    minWidth: 80,
-    height: 28,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderColor: "#d1d5db",
+    borderWidth: 1,
+    borderRadius: 8,
+    flex: 1,
+    height: 36,
   },
   buttonText: {
     fontSize: 14,
     color: "#F23059",
-    fontWeight: "500",
+    fontWeight: "600",
+    textAlign: "center",
   },
   buttonTextSecondary: {
     fontSize: 14,
     color: "#6b7280",
     fontWeight: "500",
+    textAlign: "center",
   },
 });
