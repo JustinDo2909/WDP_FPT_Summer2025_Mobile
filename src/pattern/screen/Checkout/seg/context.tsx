@@ -88,25 +88,19 @@ export default GenCtx({
 
     const discount = useMemo(() => {
       if (!selectedVoucher) return 0;
-
-      const voucherProductIds = selectedVoucher.voucherProducts?.map(
-          (vp) => vp.product.id
-        );
-        const matchingCartItems = cartItems.filter((item) =>
-          voucherProductIds?.includes(item.product_id)
-        );
-
-        const totalPrice = matchingCartItems.reduce((sum, item) => {
-          const price = item.product.sale_price ?? item.product.price;
-          const quantity = item.quantity || 1;
-          return sum + price * quantity;
-        }, 0);
-
-        if (selectedVoucher.type === "PERCENT") {
-          return Math.round(totalPrice * (selectedVoucher.discount_value / 100));
-        } else {
-          return selectedVoucher.discount_value;
-        }
+      const template = selectedVoucher.voucherTemplate;
+      const voucherProductIds = template?.voucherProducts?.map((vp) => vp.product.id);
+      const matchingCartItems = cartItems.filter((item) => voucherProductIds?.includes(item.product_id));
+      const totalPrice = matchingCartItems.reduce((sum, item) => {
+        const price = item.product.sale_price ?? item.product.price;
+        const quantity = item.quantity || 1;
+        return sum + price * quantity;
+      }, 0);
+      if (template?.type === "PERCENT") {
+        return Math.round(totalPrice * (template.discount_value / 100));
+      } else {
+        return template?.discount_value || 0;
+      }
     }, [selectedVoucher, subtotal]);
 
     const total = useMemo(() => {
@@ -401,30 +395,26 @@ export default GenCtx({
         voucher: IVoucher,
         cartItems: ICartLineItem[]
       ): number {
-        const voucherProductIds = voucher.voucherProducts?.map(
-          (vp) => vp.product.id
-        );
-        const matchingCartItems = cartItems.filter((item) =>
-          voucherProductIds?.includes(item.product_id)
-        );
-
+        const template = voucher.voucherTemplate;
+        const voucherProductIds = template?.voucherProducts?.map((vp) => vp.product.id);
+        const matchingCartItems = cartItems.filter((item) => voucherProductIds?.includes(item.product_id));
         const totalPrice = matchingCartItems.reduce((sum, item) => {
           const price = item.product.sale_price ?? item.product.price;
           const quantity = item.quantity || 1;
           return sum + price * quantity;
         }, 0);
-
-        if (voucher.type === "PERCENT") {
-          return Math.round(totalPrice * (voucher.discount_value / 100));
+        if (template?.type === "PERCENT") {
+          return Math.round(totalPrice * (template.discount_value / 100));
         } else {
-          return voucher.discount_value;
+          return template?.discount_value || 0;
         }
       },
 
       formatDiscount(voucher: IVoucher) {
-        return voucher.type === "PERCENT"
-          ? `${voucher.discount_value}% OFF`
-          : `${formatPrice(voucher.discount_value)} OFF`;
+        const template = voucher.voucherTemplate;
+        return template?.type === "PERCENT"
+          ? `${template.discount_value}% OFF`
+          : `${formatPrice(template?.discount_value || 0)} OFF`;
       },
 
       //#region UI State Management

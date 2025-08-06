@@ -52,7 +52,7 @@ export default GenCtx({
 
         return orders.filter((order) =>
           order.orderItems.some((item) =>
-            item.title.toLowerCase().includes(searchQuery)
+            (item.title?.toLowerCase() ?? "").includes(searchQuery)
           )
         );
       },

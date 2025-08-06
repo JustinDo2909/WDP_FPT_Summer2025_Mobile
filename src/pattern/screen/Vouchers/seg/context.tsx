@@ -29,6 +29,7 @@ export default GenCtx({
         }
       },
       onUseVoucher(voucher: IVoucher) {
+        // If you want to use voucherTemplate fields, access via voucher.voucherTemplate
         navigate({pathSegments: ['Home']})
       },
     };

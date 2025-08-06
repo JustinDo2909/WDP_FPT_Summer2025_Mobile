@@ -11,7 +11,7 @@ interface PurchaseItemProps {
 }
 
 export function PurchaseItem({ orderItem, orderDate }: PurchaseItemProps) {
-  const { title, price, image_url, quantity, product_id } = orderItem;
+  const { title, price, image_url, quantity, product_id, unit_price, discount_per_item, total_price, final_price } = orderItem;
   const { ss } = context.useCtx();
   const { navigate } = useCustomRouter();
 
@@ -24,7 +24,6 @@ export function PurchaseItem({ orderItem, orderDate }: PurchaseItemProps) {
     navigate({ pathSegments: ["ReviewProduct"], params: { productId: product_id } });
   };
 
-  const totalPrice = price * quantity;
 
   return (
     <Card style={styles.card}>
@@ -48,18 +47,20 @@ export function PurchaseItem({ orderItem, orderDate }: PurchaseItemProps) {
           <RText style={styles.description} numberOfLines={1}>
             Premium beauty product for daily use
           </RText>
-          
           <View style={styles.priceSection}>
             <Row style={styles.priceRow}>
               <RText style={styles.unitPriceLabel}>Unit price: </RText>
-              <RText style={styles.unitPrice}>{formatPrice(price)}</RText>
+              <RText style={styles.unitPrice}>{formatPrice(unit_price ?? price)}</RText>
+            </Row>
+            <Row style={styles.priceRow}>
+              <RText style={styles.unitPriceLabel}>Discount per item: </RText>
+              <RText style={styles.unitPrice}>{formatPrice(discount_per_item ?? 0)}</RText>
             </Row>
             <Row style={styles.totalPriceRow}>
               <RText style={styles.totalLabel}>Total: </RText>
-              <RText style={styles.totalPrice}>{formatPrice(totalPrice)}</RText>
+              <RText style={styles.totalPrice}>{formatPrice(total_price)}</RText>
             </Row>
           </View>
-          
           <Row style={styles.buttonContainer}>
             <Button
               _type="Stroke"

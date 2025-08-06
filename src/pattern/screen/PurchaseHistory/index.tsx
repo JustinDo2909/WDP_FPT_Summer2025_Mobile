@@ -65,6 +65,8 @@ export function PurchaseHistory() {
                     <RText style={styles.orderStatus}>{order.status}</RText>
                   </View>
                   <RText style={styles.orderTotal}>Total: {formatPrice(order.total_amount)}</RText>
+                                    <RText style={styles.orderTotal}>Shipping: {formatPrice(order.shipping_fee)}</RText>
+
                   <RText style={styles.orderDate}>Placed: {dateStr}</RText>
                   <View style={styles.itemsList}>
                     {order.orderItems?.map((orderItem) => (

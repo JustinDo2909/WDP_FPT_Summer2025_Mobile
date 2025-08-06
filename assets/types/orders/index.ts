@@ -5,14 +5,20 @@ declare global {
     address_id: string;
     status: "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
     total_amount: number;
+    subtotal: number;
     checkout_session_id: string;
     payment_intent_id: string;
     payment_method: "card" | "paypal" | "bank_transfer" | "cash_on_delivery";
     createdAt: string;
     updatedAt: string;
+    shipping_fee: number;
+    payment_status: string;
+    receipt_url: string;
+    discount_amount: number;
     orderItems: IOrderItem[];
     address: IAddress;
     user: IUser;
+    reason: string;
   };
 
   interface IUser {
@@ -26,21 +32,13 @@ declare global {
     order_id: string;
     product_id: string;
     title: string;
-    price: number;
+    price: number; //dep
     image_url: string;
     quantity: number;
-  }
-
-  interface IAddress {
-    id: string;
-    user_id: string;
-    title: string;
-    street: string;
-    city: string;
-    state: string;
-    postal_code: string;
-    country: string;
-    phone?: string;
+    unit_price: number;
+    discount_per_item: number;
+    total_price: number;
+    final_price: number;
   }
 }
 

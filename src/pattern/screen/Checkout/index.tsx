@@ -189,6 +189,7 @@ export function Checkout() {
             {/* Voucher Picker Modal */}
             <Modal visible={showVoucherPicker} animationType="slide">
               <VoucherPicker
+                orderTotal={subtotal}
                 cartItems={cartItems}
                 vouchers={vouchers}
                 onSelect={(voucher) => {
@@ -271,7 +272,7 @@ const styles = StyleSheet.create({
 });
 
 const formatDiscount = (voucher: IVoucher) => {
-  return voucher.type === "PERCENT"
-    ? `${voucher.discount_value}% Off `
-    : `${formatPrice(voucher.discount_value)} Off`;
+  return voucher.voucherTemplate.type === "PERCENT"
+    ? `${voucher.voucherTemplate.discount_value}% Off `
+    : `${formatPrice(voucher.voucherTemplate.discount_value)} Off`;
 };

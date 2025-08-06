@@ -5,10 +5,11 @@ import { formatPrice } from "@/src/libs/share/formatPrice";
 import { VoucherCard } from "@/src/pattern/share/VoucherCard";
 import context from "./context";
 
-export function VoucherPicker({ vouchers, onSelect, selectedId, cartItems }: {
+export function VoucherPicker({ vouchers, onSelect, selectedId, cartItems, orderTotal }: {
   vouchers: IVoucher[];
   onSelect: (voucher: IVoucher) => void;
   selectedId?: string;
+  orderTotal: number;
   cartItems: ICartLineItem[]
 }) {
 
@@ -23,15 +24,22 @@ export function VoucherPicker({ vouchers, onSelect, selectedId, cartItems }: {
     if (!vouchers) return [];
     return vouchers
       .map(voucher => {
-        const applicable = Array.isArray(voucher.voucherProducts) &&
-          voucher.voucherProducts.some(vp => cartProductIds.includes(vp.product.id));
+        const template = voucher.voucherTemplate;
+        const applicable =
+          Array.isArray(voucher.voucherTemplate.voucherProducts) &&
+          (voucher.voucherTemplate.voucherProducts.some((vp) =>
+            cartProductIds.includes(vp.product.id)
+          ) ||
+            voucher.voucherTemplate.voucherProducts?.length === 0) &&
+          orderTotal > (voucher.voucherTemplate.min_order_amount ?? 0);
         const savings = applicable ? meds.calculateVoucherSavings(voucher, cartItems) : 0;
         return { id : voucher.id, voucher, applicable, savings };
       })
       .sort((a, b) => {
         if (a.applicable !== b.applicable) return a.applicable ? -1 : 1;
         return b.savings - a.savings; // Sort by savings in descending order
-      });
+      })
+      .filter((p) => new Date(p.voucher.expired_at) > new Date() && !p.voucher.redeemed);
   }, [vouchers, cartProductIds, cartItems]);
   return (
     <View style={styles.container}>
@@ -39,7 +47,7 @@ export function VoucherPicker({ vouchers, onSelect, selectedId, cartItems }: {
         data={sortedVouchers}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
-          <VoucherCard applicable={item.applicable} onUse={onSelect} voucher={item.voucher} buttonText="Apply" savings={item.savings}/>
+          <VoucherCard applicable={item.applicable} onUse={onSelect} voucher={item.voucher} buttonText="Apply" savings={item.savings} selectedId={selectedId}/>
         )}
       />
     </View>
@@ -115,7 +123,8 @@ const styles = StyleSheet.create({
 });
 
 const formatDiscount = (voucher: IVoucher) => {
-  return voucher.type === "PERCENT"
-    ? `GIẢM ${voucher.discount_value}% `
-    : `GIẢM ${formatPrice(voucher.discount_value)}`;
+  const template = voucher.voucherTemplate;
+  return template?.type === "PERCENT"
+    ? `GIẢM ${template.discount_value}% `
+    : `GIẢM ${formatPrice(template?.discount_value || 0)}`;
 };

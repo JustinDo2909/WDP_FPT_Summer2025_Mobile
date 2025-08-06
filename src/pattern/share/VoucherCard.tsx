@@ -9,16 +9,19 @@ export function VoucherCard({
   onUse,
   buttonText = "Use Now",
   applicable,
-  savings
+  savings,
+  selectedId
 }: {
   voucher: IVoucher;
   onUse: (v: IVoucher) => void;
   buttonText?: string;
   applicable?: boolean;
   savings?: number;
+  selectedId?: string;
 }) {
   const isRedeemed = voucher.redeemed;
   const {meds} = context.useCtx()
+  const template = voucher.voucherTemplate;
   const expiry = new Date(new Date(voucher.created_at).getTime() + 2 * 24 * 60 * 60 * 1000);
   const expiryDate = expiry.toLocaleDateString("vi-VN");
   return (
@@ -37,15 +40,15 @@ export function VoucherCard({
         )}
         <View style={styles.voucherIconBox}>
           <RText style={styles.voucherIconText}>
-            {voucher.type === "AMOUNT"
-              ? `${voucher.discount_value}K`
-              : `${voucher.discount_value}%`}
+            {template?.type === "AMOUNT"
+              ? `${template.discount_value}K`
+              : `${template?.discount_value || 0}%`}
           </RText>
           <RText style={styles.voucherIconText}>Off</RText>
         </View>
       </View>
       <View style={styles.middleCol}>
-        <RText style={styles.voucherTitle}>Get {formatDiscount(voucher)}</RText>
+        <RText style={styles.voucherTitle}>Get {formatDiscount(voucher)}, min order {formatPrice(voucher.voucherTemplate.min_order_amount)}</RText>
        
        {buttonText != "Use Now" && <RText style={styles.savingsText}>
           {applicable
@@ -54,20 +57,14 @@ export function VoucherCard({
         </RText>
         }
 
-        {(voucher.voucherProducts && voucher.voucherProducts.length > 0) && (
+        {(template?.voucherProducts && template.voucherProducts.length > 0) && (
           <Wrap className="mt-2 text-xs text-gray-600">
             <RText>Applicable for:&nbsp;
-            {voucher.voucherProducts.map((vp, index) => (
+            {template.voucherProducts.map((vp, index) => (
               <React.Fragment key={vp.product.id}>
-                {/* <Link
-                  href={`/products/${vp.product.id}`}
-                  className="text-blue-600 hover:underline"
-                > */}
                   {vp.product.title}
-                {/* </Link> */}
-                {index < voucher.voucherProducts.length - 1 && ", "}
+                {index < template.voucherProducts.length - 1 && ", "}
               </React.Fragment>
-              
             ))}
             </RText>
           </Wrap>
@@ -89,7 +86,7 @@ export function VoucherCard({
           {isRedeemed || !applicable ? (
             <RText style={styles.disabledText}>{buttonText}</RText>
           ) : (
-            <RText style={styles.useNowText}>{buttonText}</RText>
+            <RText style={styles.useNowText}>{selectedId=== voucher.id ? "Applied" : buttonText}</RText>
           )}
         </TouchableOpacity>
         <TouchableOpacity>
@@ -101,9 +98,10 @@ export function VoucherCard({
 }
 
 const formatDiscount = (voucher: IVoucher) => {
-  return voucher.type === "PERCENT"
-    ? `${voucher.discount_value}% OFF`
-    : `${formatPrice(voucher.discount_value)} OFF`;
+  const template = voucher.voucherTemplate;
+  return template?.type === "PERCENT"
+    ? `${template.discount_value}% OFF`
+    : `${formatPrice(template?.discount_value || 0)} OFF`;
 }
 
 const styles = StyleSheet.create({
